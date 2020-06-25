@@ -20,40 +20,55 @@ namespace PackagePopularityTracker
 {
     public static class UpdatePackageStats
     {
-        [FunctionName("UpdatePackageStats")]
-        public static void Run([TimerTrigger("0 0 * * * *")] TimerInfo myTimer, ILogger log)
+        [FunctionName("UpdatePackageStats")] // run on minute 1 of every hour
+        public static void Run([TimerTrigger("0 1 * * * *")] TimerInfo myTimer, ILogger log)
         {
             Stopwatch sw = Stopwatch.StartNew();
 
-            StringBuilder sb = new StringBuilder();
-
-            string timeStamp = DateTime.UtcNow.AddSeconds(5).ToString("u");
-            sb.Append($"{timeStamp},");
-
             string packageList = ReadBlobText("packagestats", "packages.txt");
             string[] packageNames = packageList.Split(Environment.NewLine);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"{DateTime.UtcNow.ToString("u")},");
             foreach (string packageName in packageNames)
             {
                 string trimmedPackageName = packageName.Trim();
-                int downloadCount = LookupDownloadCount(trimmedPackageName);
-                sb.Append($"{trimmedPackageName}={downloadCount},");
+                int downloadsApi = GetDownloadsWithAPI(trimmedPackageName);
+                int downloadsWeb = GetDownloadsScarpingWebsite(trimmedPackageName);
+                sb.Append($"{trimmedPackageName}={downloadsApi}|{downloadsWeb},");
             }
-
             string statsLine = sb.ToString().Trim(',');
             log.LogInformation(statsLine);
             AppendBlob("packagestats", "downloads.txt", statsLine);
 
             log.LogInformation($"Looked-up {packageNames.Length} packages in {sw.Elapsed} seconds");
-
         }
 
-        private static int LookupDownloadCount(string packageName)
+        private static int GetDownloadsScarpingWebsite(string packageName)
+        {
+            string url = "https://www.nuget.org/packages/" + packageName;
+            using var webClient = new System.Net.WebClient();
+            string[] lines = webClient.DownloadString(url).Split(Environment.NewLine);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string thisLine = lines[i].Trim();
+                if (thisLine.EndsWith("total downloads"))
+                {
+                    thisLine = thisLine.Replace("total downloads", "");
+                    bool isSuccessfulParse = int.TryParse(thisLine, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out int downloadCount);
+                    if (isSuccessfulParse)
+                        return downloadCount;
+                }
+            }
+            return -1;
+        }
+
+        private static int GetDownloadsWithAPI(string packageName)
         {
             string url = "https://azuresearch-usnc.nuget.org/query?take=1&q=" + packageName;
-
             using var webClient = new System.Net.WebClient();
-
             byte[] bytes = webClient.DownloadData(url);
+
             var jsonReader = JsonReaderWriterFactory.CreateJsonReader(bytes, new System.Xml.XmlDictionaryReaderQuotas());
             XElement element = XElement.Load(jsonReader).XPathSelectElement("//data").Elements().First();
 
