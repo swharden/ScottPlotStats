@@ -1,0 +1,22 @@
+/* create tables */
+CREATE TABLE PackageStatsAPI (
+    UtcDateTime datetime,
+    Package varchar(255),
+    Downloads int,
+);
+
+CREATE TABLE PackageStatsWeb (
+    UtcDateTime datetime,
+    Package varchar(255),
+    Downloads int,
+);
+
+/* delete tables */
+DROP TABLE PackageStatsAPI;
+DROP TABLE PackageStatsWeb;
+
+/* add a row */
+
+
+/* delete all rows */
+DELETE FROM PackageStatsAPI;

@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using System.Configuration;
 using Microsoft.Azure;
 using Microsoft.Azure.Storage.RetryPolicies;
+using System.Data.SqlClient;
 
 namespace PackagePopularityTracker
 {
@@ -26,61 +27,39 @@ namespace PackagePopularityTracker
             Stopwatch sw = Stopwatch.StartNew();
 
             string packageList = ReadBlobText("packagestats", "packages.txt");
-            string[] packageNames = packageList.Split(Environment.NewLine);
+            string[] packageNames = packageList.Split('\n');
 
             StringBuilder sb = new StringBuilder();
-            sb.Append($"{DateTime.UtcNow.ToString("u")},");
-            foreach (string packageName in packageNames)
+            for (int i = 0; i < packageNames.Length; i++)
             {
-                string trimmedPackageName = packageName.Trim();
-                int downloadsApi = GetDownloadsWithAPI(trimmedPackageName);
-                int downloadsWeb = GetDownloadsScarpingWebsite(trimmedPackageName);
-                sb.Append($"{trimmedPackageName}={downloadsApi}|{downloadsWeb},");
+                string packageName = packageNames[i].Trim();
+                int downloadsApi = GetDownloadsFromJson(packageName);
+                int downloadsWeb = GetDownloadsFromHtml(packageName);
+                sb.AppendLine($"INSERT INTO PackageStatsAPI VALUES ('{DateTime.UtcNow}', '{packageName}', {downloadsApi});");
+                sb.AppendLine($"INSERT INTO PackageStatsWeb VALUES ('{DateTime.UtcNow}', '{packageName}', {downloadsWeb});");
+                log.LogInformation($"NuGet package '{packageName}' has {downloadsApi} API and {downloadsWeb} web downloads");
             }
-            string statsLine = sb.ToString().Trim(',');
-            log.LogInformation(statsLine);
-            AppendBlob("packagestats", "downloads.txt", statsLine);
 
-            log.LogInformation($"Looked-up {packageNames.Length} packages in {sw.Elapsed} seconds");
+            ExecuteSqlQuery(sb.ToString(), log);
+
+            log.LogInformation($"Finished researching {packageNames.Length} packages in {sw.Elapsed} seconds");
         }
 
-        private static int GetDownloadsScarpingWebsite(string packageName)
+        private static async void ExecuteSqlQuery(string query, ILogger log)
         {
-            string url = "https://www.nuget.org/packages/" + packageName;
-            using var webClient = new System.Net.WebClient();
-            string[] lines = webClient.DownloadString(url).Split(Environment.NewLine);
-            for (int i = 0; i < lines.Length; i++)
+            string sqlConnectionString = Environment.GetEnvironmentVariable("sqlConnString");
+            using (SqlConnection conn = new SqlConnection(sqlConnectionString))
             {
-                string thisLine = lines[i].Trim();
-                if (thisLine.EndsWith("total downloads"))
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    thisLine = thisLine.Replace("total downloads", "");
-                    bool isSuccessfulParse = int.TryParse(thisLine, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out int downloadCount);
-                    if (isSuccessfulParse)
-                        return downloadCount;
+                    int modifiedRowCount = await cmd.ExecuteNonQueryAsync();
+                    log.LogInformation($"modified {modifiedRowCount} database rows");
                 }
             }
-            return -1;
         }
 
-        private static int GetDownloadsWithAPI(string packageName)
-        {
-            string url = "https://azuresearch-usnc.nuget.org/query?take=1&q=" + packageName;
-            using var webClient = new System.Net.WebClient();
-            byte[] bytes = webClient.DownloadData(url);
-
-            var jsonReader = JsonReaderWriterFactory.CreateJsonReader(bytes, new System.Xml.XmlDictionaryReaderQuotas());
-            XElement element = XElement.Load(jsonReader).XPathSelectElement("//data").Elements().First();
-
-            string packageName2 = element.XPathSelectElement("title").Value;
-            if (packageName != packageName2)
-                throw new InvalidOperationException($"package name '{packageName2}' did not match '{packageName}'");
-
-            int downloads = int.Parse(element.XPathSelectElement("totalDownloads").Value);
-            return downloads;
-        }
-
-        public static string ReadBlobText(string containerName, string fileName)
+        private static string ReadBlobText(string containerName, string fileName)
         {
             string connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage", EnvironmentVariableTarget.Process);
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
@@ -104,18 +83,40 @@ namespace PackagePopularityTracker
             return text;
         }
 
-        public static void AppendBlob(string containerName, string fileName, string txt, bool lineBreakBefore = true)
+        private static int GetDownloadsFromHtml(string packageName)
         {
-            string connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage", EnvironmentVariableTarget.Process);
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
-            CloudAppendBlob appendBlob = container.GetAppendBlobReference(fileName);
-            if (!appendBlob.Exists())
-                appendBlob.CreateOrReplace();
-            if (lineBreakBefore)
-                appendBlob.AppendText("\n");
-            appendBlob.AppendText(txt);
+            string url = "https://www.nuget.org/packages/" + packageName;
+            using var webClient = new System.Net.WebClient();
+            string[] lines = webClient.DownloadString(url).Split(Environment.NewLine);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string thisLine = lines[i].Trim();
+                if (thisLine.EndsWith("total downloads"))
+                {
+                    thisLine = thisLine.Replace("total downloads", "");
+                    bool isSuccessfulParse = int.TryParse(thisLine, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out int downloadCount);
+                    if (isSuccessfulParse)
+                        return downloadCount;
+                }
+            }
+            return -1;
+        }
+
+        private static int GetDownloadsFromJson(string packageName)
+        {
+            string url = "https://azuresearch-usnc.nuget.org/query?take=1&q=" + packageName;
+            using var webClient = new System.Net.WebClient();
+            byte[] bytes = webClient.DownloadData(url);
+
+            var jsonReader = JsonReaderWriterFactory.CreateJsonReader(bytes, new System.Xml.XmlDictionaryReaderQuotas());
+            XElement element = XElement.Load(jsonReader).XPathSelectElement("//data").Elements().First();
+
+            string packageName2 = element.XPathSelectElement("title").Value;
+            if (packageName != packageName2)
+                throw new InvalidOperationException($"package name '{packageName2}' did not match '{packageName}'");
+
+            int downloads = int.Parse(element.XPathSelectElement("totalDownloads").Value);
+            return downloads;
         }
     }
 }
