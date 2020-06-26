@@ -45,7 +45,7 @@ namespace PackagePopularityTracker
             log.LogInformation($"Finished researching {packageNames.Length} packages in {sw.Elapsed} seconds");
         }
 
-        private static async void ExecuteSqlQuery(string query, ILogger log)
+        private static void ExecuteSqlQuery(string query, ILogger log)
         {
             string sqlConnectionString = Environment.GetEnvironmentVariable("sqlConnString");
             using (SqlConnection conn = new SqlConnection(sqlConnectionString))
@@ -53,7 +53,7 @@ namespace PackagePopularityTracker
                 conn.Open();
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    int modifiedRowCount = await cmd.ExecuteNonQueryAsync();
+                    int modifiedRowCount = cmd.ExecuteNonQuery();
                     log.LogInformation($"modified {modifiedRowCount} database rows");
                 }
             }
