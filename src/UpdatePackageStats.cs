@@ -24,63 +24,40 @@ namespace PackagePopularityTracker
         [FunctionName("UpdatePackageStats")] // run on minute 1 of every hour
         public static void Run([TimerTrigger("0 1 * * * *")] TimerInfo myTimer, ILogger log)
         {
-            Stopwatch sw = Stopwatch.StartNew();
+            using SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqlConnString"));
+            conn.Open();
 
-            string packageList = ReadBlobText("packagestats", "packages.txt");
-            string[] packageNames = packageList.Split('\n');
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < packageNames.Length; i++)
+            // read package list from the database
+            var packageNames = new List<string>();
+            using (SqlCommand sqlCmd = new SqlCommand("SELECT * FROM PackageStatsPackages", conn))
+            using (SqlDataReader reader = sqlCmd.ExecuteReader())
             {
-                string packageName = packageNames[i].Trim();
+                while (reader.Read())
+                {
+                    string packageName = (string)reader["PackageName"];
+                    packageNames.Add(packageName);
+                }
+            }
+            log.LogInformation($"Database listed {packageNames.Count()} packages: " + string.Join(", ", packageNames));
+
+            // look up downloads for each package and build a query
+            string timestamp = DateTime.UtcNow.ToString();
+            StringBuilder sb = new StringBuilder();
+            foreach (var packageName in packageNames)
+            {
                 int downloadsApi = GetDownloadsFromJson(packageName);
                 int downloadsWeb = GetDownloadsFromHtml(packageName);
-                sb.AppendLine($"INSERT INTO PackageStatsAPI VALUES ('{DateTime.UtcNow}', '{packageName}', {downloadsApi});");
-                sb.AppendLine($"INSERT INTO PackageStatsWeb VALUES ('{DateTime.UtcNow}', '{packageName}', {downloadsWeb});");
+                sb.AppendLine($"INSERT INTO PackageStatsAPI VALUES ('{timestamp}', '{packageName}', {downloadsApi});");
+                sb.AppendLine($"INSERT INTO PackageStatsWeb VALUES ('{timestamp}', '{packageName}', {downloadsWeb});");
                 log.LogInformation($"NuGet package '{packageName}' has {downloadsApi} API and {downloadsWeb} web downloads");
             }
 
-            ExecuteSqlQuery(sb.ToString(), log);
-
-            log.LogInformation($"Finished researching {packageNames.Length} packages in {sw.Elapsed} seconds");
-        }
-
-        private static void ExecuteSqlQuery(string query, ILogger log)
-        {
-            string sqlConnectionString = Environment.GetEnvironmentVariable("sqlConnString");
-            using (SqlConnection conn = new SqlConnection(sqlConnectionString))
+            // execute the query
+            using (SqlCommand sqlCmd = new SqlCommand(sb.ToString(), conn))
             {
-                conn.Open();
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    int modifiedRowCount = cmd.ExecuteNonQuery();
-                    log.LogInformation($"modified {modifiedRowCount} database rows");
-                }
+                int affectedRowCount = sqlCmd.ExecuteNonQuery();
+                log.LogInformation($"affected {affectedRowCount} database rows");
             }
-        }
-
-        private static string ReadBlobText(string containerName, string fileName)
-        {
-            string connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage", EnvironmentVariableTarget.Process);
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
-            var thisBlob = container.GetBlockBlobReference(fileName);
-
-            using var memoryStream = new MemoryStream();
-
-            var blobRequestOptions = new BlobRequestOptions
-            {
-                ServerTimeout = TimeSpan.FromSeconds(30),
-                MaximumExecutionTime = TimeSpan.FromSeconds(120),
-                RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(3), maxAttempts: 3),
-            };
-
-            thisBlob.DownloadToStream(memoryStream, null, blobRequestOptions);
-            byte[] bytes = memoryStream.ToArray();
-            string text = Encoding.Default.GetString(bytes);
-
-            return text;
         }
 
         private static int GetDownloadsFromHtml(string packageName)
