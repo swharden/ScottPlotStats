@@ -20,3 +20,13 @@ DROP TABLE PackageStatsWeb;
 
 /* delete all rows */
 DELETE FROM PackageStatsAPI;
+
+/* delete rows matching a timestamp */
+DELETE FROM PackageStatsAPI WHERE UtcDateTime='2020-06-26T02:25:16';
+
+/* read latest readings */
+SELECT TOP (1000) * FROM [dbo].[PackageStatsAPI] ORDER BY UtcDateTime Desc;
+SELECT TOP (1000) * FROM [dbo].[PackageStatsWEB] ORDER BY UtcDateTime Desc;
+
+/* for one package */
+SELECT TOP (1000) * FROM [dbo].[PackageStatsAPI] WHERE Package='ScottPlot' ORDER BY UtcDateTime Desc;
