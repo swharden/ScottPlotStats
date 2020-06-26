@@ -1,0 +1,25 @@
+
+        [FunctionName("UpdatePackageStats")] // run on minute 1 of every hour
+        public static void Run(
+            [TimerTrigger("0 1 * * * *")] TimerInfo myTimer,
+            ILogger log)
+        {
+            string tableConnStr = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(tableConnStr);
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            CloudTable table = tableClient.GetTableReference("packageStats");
+
+            PackageStat ps1 = new PackageStat() { Package = "samplePackage1", DownloadsApi = 123, DownloadsWeb = 321 };
+            PackageStat ps2 = new PackageStat() { Package = "samplePackage2", DownloadsApi = 111, DownloadsWeb = 222 };
+            TableOperation to1 = TableOperation.Insert(ps1);
+            TableOperation to2 = TableOperation.Insert(ps2);
+            table.Execute(to1);
+            table.Execute(to2);
+
+            TableQuery<PackageStat> query = new TableQuery<PackageStat>()
+                    .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "packageStatPartition"));
+
+            foreach (PackageStat item in table.ExecuteQuery(query))
+            {
+                Console.WriteLine(item);
+            }
