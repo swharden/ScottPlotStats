@@ -4,12 +4,6 @@
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroup')]/providers/Microsoft.Storage/storageAccounts/swhardendev",
       "type": "storage.azure",
       "connectionId": "AzureWebJobsStorage"
-    },
-    "mssql1": {
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroup')]/providers/Microsoft.Sql/servers/swhardensql/databases/swhardendb",
-      "type": "mssql.azure",
-      "connectionId": "sqlConnString",
-      "secretStore": "LocalSecretsFile"
     }
   }
 }
