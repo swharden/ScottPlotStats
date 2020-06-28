@@ -2,9 +2,14 @@
 
 This Azure Functions project runs hourly to log total download count for certain NuGet packages and store the results in a SQL database. 
 
-After running for an extended period of time, these records will be automatically plotted to reveal trends in NuGet package popularity over time.
+![](https://swhardendev.z13.web.core.windows.net/packagestats/ScottPlot.png)
+![](https://swhardendev.z13.web.core.windows.net/packagestats/ScottPlot.WinForms.png)
+![](https://swhardendev.z13.web.core.windows.net/packagestats/ScottPlot.WPF.png)
+![](https://swhardendev.z13.web.core.windows.net/packagestats/Spectrogram.png)
+![](https://swhardendev.z13.web.core.windows.net/packagestats/FftSharp.png)
 
-This project recently started running (June 25, 2020) so come back later to see how it turns out...
+### Azure URLs
 
-You can check the current status of this Azure Function here:
-https://packagepopularitytracker.azurewebsites.net/
+* https://packagepopularitytracker.azurewebsites.net/
+
+* https://swhardendev.z13.web.core.windows.net/
