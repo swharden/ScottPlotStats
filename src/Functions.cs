@@ -7,6 +7,7 @@ using Microsoft.Azure.Cosmos.Table;
 using Azure.Storage.Blobs;
 using System.IO;
 using System.Drawing.Imaging;
+using System.Collections.Generic;
 
 namespace PackagePopularityTracker
 {
@@ -42,6 +43,26 @@ namespace PackagePopularityTracker
             }
         }
 
+        public static (double[] xs, double[] ys) UniquePoints(double[] xs, double[] ys)
+        {
+            List<double> xs2 = new List<double>();
+            List<double> ys2 = new List<double>();
+
+            xs2.Add(xs[0]);
+            ys2.Add(ys[1]);
+
+            for (int i = 1; i < ys.Length; i++)
+            {
+                if (ys2.Last() != ys[i])
+                {
+                    xs2.Add(xs[i]);
+                    ys2.Add(ys[i]);
+                }
+            }
+
+            return (xs2.ToArray(), ys2.ToArray());
+        }
+
         [FunctionName("UpdatePackagePlots")] // run on minute 2 of every hour
         public static void UpdatePackagePlots([TimerTrigger("0 2 * * * *")] TimerInfo myTimer, ILogger log)
         {
@@ -66,10 +87,14 @@ namespace PackagePopularityTracker
                 double[] datetimes = stats.Select(x => x.Timestamp.DateTime.ToOADate()).ToArray();
                 double[] downloads = stats.Select(x => (double)x.Downloads).ToArray();
 
+                var unique = UniquePoints(datetimes, downloads);
+
                 var plt = new ScottPlot.Plot(600, 400);
                 plt.Title(packageName);
                 plt.YLabel("Downloads");
-                plt.PlotScatter(datetimes, downloads);
+                //plt.PlotScatter(datetimes, downloads, lineWidth: 0);
+                //plt.PlotStep(unique.xs, unique.ys);
+                plt.PlotScatter(unique.xs, unique.ys, lineWidth: 2);
                 plt.Ticks(dateTimeX: true);
 
                 string filePath = $"packagestats/{packageName}.png";
