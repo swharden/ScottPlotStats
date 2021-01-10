@@ -17,7 +17,7 @@ namespace PackagePopularityTracker.Functions
         /// This method reads the latest total download counts and logs findings to tabular storage.
         /// </summary>
         [FunctionName("UpdatePackageStats")]
-        public static void UpdatePackageStats([TimerTrigger(OncePerHour)] TimerInfo _, ILogger log)
+        public static void UpdatePackageStats([TimerTrigger(OncePerHour)] TimerInfo myTimer, ILogger log)
         {
             // connect to tabular storage
             string connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage", EnvironmentVariableTarget.Process);

@@ -8,6 +8,7 @@ using Azure.Storage.Blobs;
 using System.IO;
 using System.Drawing.Imaging;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace PackagePopularityTracker.Functions
 {
@@ -16,7 +17,7 @@ namespace PackagePopularityTracker.Functions
         const string OncePerDay = "0 23 10 * * *"; // at 10:23 AM UTC (5:23 AM EST)
 
         [FunctionName("UpdatePackagePlots")]
-        public static void UpdatePackagePlots([TimerTrigger(OncePerDay)] TimerInfo _, ILogger log)
+        public static void UpdatePackagePlots([TimerTrigger(OncePerDay)] TimerInfo myTimer, ILogger log)
         {
             string connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage", EnvironmentVariableTarget.Process);
             CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
@@ -36,6 +37,7 @@ namespace PackagePopularityTracker.Functions
             {
                 // extract unique X/Y points for this package
                 PackageStat[] stats = allStats.Where(x => x.Package == packageName).ToArray();
+                SaveJsonStats(packageName, stats, containerClient);
                 log.LogInformation($"Package {packageName} has {stats.Length} records.");
                 double[] datetimes = stats.Select(x => x.Timestamp.DateTime.ToOADate()).ToArray();
                 double[] downloads = stats.Select(x => (double)x.Downloads).ToArray();
@@ -57,6 +59,27 @@ namespace PackagePopularityTracker.Functions
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 blobClient.Upload(memoryStream, overwrite: true);
             }
+        }
+
+        private static void SaveJsonStats(string packageName, PackageStat[] stats, BlobContainerClient containerClient)
+        {
+            var sb = new System.Text.StringBuilder("[");
+            int lastCount = -1;
+            foreach (PackageStat stat in stats)
+            {
+                if (stat.Downloads == lastCount)
+                    continue;
+                lastCount = stat.Downloads;
+                sb.Append($"[\"{stat.Timestamp:s}\",{stat.Downloads}],");
+            }
+            sb.Remove(sb.Length - 1, 1);
+            sb.Append(']');
+
+            string json = sb.ToString();
+            string filePath = $"packagestats/{packageName}.json";
+            BlobClient blobClient = containerClient.GetBlobClient(filePath);
+            using MemoryStream stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(json));
+            blobClient.Upload(stream);
         }
 
         /// <summary>
