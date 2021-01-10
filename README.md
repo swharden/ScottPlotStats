@@ -6,11 +6,11 @@ Hourly download stats are recorded in tabular storage, and new plots are generat
 
 Unlike [NuGet Trends](https://nugettrends.com/packages?ids=ScottPlot&months=36) which only updates once per week, these download counts can be updated at any sample rate. 
 
-## View Latest Plots
+## Live Download Stats
 
 Plots are stored as static files in Azure Blob Storage:
 
 **https://swhardendev.z13.web.core.windows.net** 
 👈 _View latest plots_
 
-[![](dev/ScottPlot.png)](https://swhardendev.z13.web.core.windows.net)
+[![](https://swhardendev.z13.web.core.windows.net/packagestats/ScottPlot.png)](https://swhardendev.z13.web.core.windows.net)
