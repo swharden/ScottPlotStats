@@ -12,7 +12,7 @@ namespace NuGetPPT.Tests
         {
             string json = SampleData.ReadSampleData("logs-scottplot.json");
             var downloads = IO.FromJson(json);
-            Assert.AreEqual(343, downloads.Count);
+            Assert.AreEqual(401, downloads.Count);
 
             foreach (var d in downloads)
                 Console.WriteLine($"{d.Timestamp}\t{d.Downloads}");
