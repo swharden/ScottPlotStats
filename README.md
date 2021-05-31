@@ -1,16 +1,5 @@
 # NuGet Package Popularity Tracker
 
-**This project uses Azure Functions to periodically record the total download count for certain NuGet packages.** 
+**This project creates charts that show the historical download count of NuGet packages.** Data is collected using Azure Functions, stored in blob storage, and plotted using [ScottPlot](https://swharden.com/scottplot), and served as a static image. Creating charts as web-accessible images allows them to be included in GitHub readme files.
 
-Hourly download stats are recorded in tabular storage, and new plots are generated daily (with [ScottPlot](https://swharden.com/scottplot/) and [Google Charts](https://developers.google.com/chart)) and stored in web-accessible blob storage.
-
-Unlike [NuGet Trends](https://nugettrends.com/packages?ids=ScottPlot&months=36) which only updates once per week, these download counts can be updated at any sample rate. 
-
-## Live Download Stats
-
-Plots are stored as static files in Azure Blob Storage:
-
-**https://swhardendev.z13.web.core.windows.net** 
-👈 _View latest plots_
-
-[![](https://swhardendev.z13.web.core.windows.net/packagestats/ScottPlot.png)](https://swhardendev.z13.web.core.windows.net)
+[NuGet Trends](https://nugettrends.com/packages?ids=ScottPlot&months=36) is a similar project, but their data is only updated once per week, and is only available online in JSON format.
