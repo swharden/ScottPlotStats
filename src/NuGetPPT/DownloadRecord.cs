@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace NuGetPPT
 {
-    public class DownloadRecord
+    public class DownloadRecord : IComparable<DownloadRecord>
     {
         public readonly string Timestamp;
         public readonly int Downloads;
@@ -14,6 +15,16 @@ namespace NuGetPPT
             Timestamp = timestamp;
             Downloads = downloads;
             DateTime = DateTime.Parse(timestamp);
+        }
+
+        public int CompareTo(DownloadRecord other)
+        {
+            if (DateTime > other.DateTime)
+                return 1;
+            else if (DateTime < other.DateTime)
+                return -1;
+            else
+                return 0;
         }
     }
 }

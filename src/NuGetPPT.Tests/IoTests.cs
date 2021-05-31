@@ -19,10 +19,12 @@ namespace NuGetPPT.Tests
         }
 
         [Test]
-        public void Test_Logs_AreConsecutive()
+        public void Test_Logs_AreConsecutiveAfterSorting()
         {
             string json = SampleData.ReadSampleData("logs-scottplot.json");
             var downloads = IO.FromJson(json);
+
+            downloads.Sort();
 
             var last = new DateTime();
             foreach (var d in downloads)
