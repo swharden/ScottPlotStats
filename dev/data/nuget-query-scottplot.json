@@ -1,0 +1,354 @@
+{
+    "@context": {
+        "@vocab": "http://schema.nuget.org/schema#",
+        "@base": "https://api.nuget.org/v3/registration5-semver1/"
+    },
+    "totalHits": 5,
+    "data": [
+        {
+            "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/index.json",
+            "@type": "Package",
+            "registration": "https://api.nuget.org/v3/registration5-semver1/scottplot/index.json",
+            "id": "ScottPlot",
+            "version": "4.1.16",
+            "description": "ScottPlot is a free and open-source plotting library for .NET. This package can be used to create static plots, and user controls for interactively displaying plots in WinForms or WPF applications are available as separate packages.",
+            "summary": "",
+            "title": "ScottPlot",
+            "iconUrl": "https://api.nuget.org/v3-flatcontainer/scottplot/4.1.16/icon",
+            "licenseUrl": "https://www.nuget.org/packages/ScottPlot/4.1.16/license",
+            "projectUrl": "https://swharden.com/scottplot/",
+            "tags": [
+                "plot",
+                "graph",
+                "data",
+                "chart",
+                "signal",
+                "line",
+                "bar",
+                "C#"
+            ],
+            "authors": [
+                "Scott Harden"
+            ],
+            "totalDownloads": 87115,
+            "verified": false,
+            "packageTypes": [
+                {
+                    "name": "Dependency"
+                }
+            ],
+            "versions": [
+                {
+                    "version": "3.0.1",
+                    "downloads": 378,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.0.1.json"
+                },
+                {
+                    "version": "3.0.2",
+                    "downloads": 324,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.0.2.json"
+                },
+                {
+                    "version": "3.0.3",
+                    "downloads": 1503,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.0.3.json"
+                },
+                {
+                    "version": "3.0.4",
+                    "downloads": 281,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.0.4.json"
+                },
+                {
+                    "version": "3.0.5",
+                    "downloads": 283,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.0.5.json"
+                },
+                {
+                    "version": "3.0.6",
+                    "downloads": 389,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.0.6.json"
+                },
+                {
+                    "version": "3.0.7",
+                    "downloads": 303,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.0.7.json"
+                },
+                {
+                    "version": "3.0.8",
+                    "downloads": 363,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.0.8.json"
+                },
+                {
+                    "version": "3.0.9",
+                    "downloads": 777,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.0.9.json"
+                },
+                {
+                    "version": "3.1.1",
+                    "downloads": 554,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.1.1.json"
+                },
+                {
+                    "version": "3.1.3",
+                    "downloads": 609,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.1.3.json"
+                },
+                {
+                    "version": "3.1.4",
+                    "downloads": 363,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.1.4.json"
+                },
+                {
+                    "version": "3.1.5",
+                    "downloads": 431,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.1.5.json"
+                },
+                {
+                    "version": "3.1.6",
+                    "downloads": 913,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/3.1.6.json"
+                },
+                {
+                    "version": "4.0.1",
+                    "downloads": 826,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.1.json"
+                },
+                {
+                    "version": "4.0.2",
+                    "downloads": 427,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.2.json"
+                },
+                {
+                    "version": "4.0.3",
+                    "downloads": 257,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.3.json"
+                },
+                {
+                    "version": "4.0.4",
+                    "downloads": 306,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.4.json"
+                },
+                {
+                    "version": "4.0.5",
+                    "downloads": 316,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.5.json"
+                },
+                {
+                    "version": "4.0.7",
+                    "downloads": 314,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.7.json"
+                },
+                {
+                    "version": "4.0.8",
+                    "downloads": 212,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.8.json"
+                },
+                {
+                    "version": "4.0.9",
+                    "downloads": 2340,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.9.json"
+                },
+                {
+                    "version": "4.0.10",
+                    "downloads": 322,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.10.json"
+                },
+                {
+                    "version": "4.0.11",
+                    "downloads": 333,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.11.json"
+                },
+                {
+                    "version": "4.0.12",
+                    "downloads": 271,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.12.json"
+                },
+                {
+                    "version": "4.0.13",
+                    "downloads": 1182,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.13.json"
+                },
+                {
+                    "version": "4.0.14",
+                    "downloads": 446,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.14.json"
+                },
+                {
+                    "version": "4.0.15",
+                    "downloads": 363,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.15.json"
+                },
+                {
+                    "version": "4.0.16",
+                    "downloads": 412,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.16.json"
+                },
+                {
+                    "version": "4.0.17",
+                    "downloads": 773,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.17.json"
+                },
+                {
+                    "version": "4.0.18",
+                    "downloads": 1764,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.18.json"
+                },
+                {
+                    "version": "4.0.19",
+                    "downloads": 1265,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.19.json"
+                },
+                {
+                    "version": "4.0.21",
+                    "downloads": 1837,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.21.json"
+                },
+                {
+                    "version": "4.0.22",
+                    "downloads": 614,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.22.json"
+                },
+                {
+                    "version": "4.0.23",
+                    "downloads": 394,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.23.json"
+                },
+                {
+                    "version": "4.0.24",
+                    "downloads": 352,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.24.json"
+                },
+                {
+                    "version": "4.0.25",
+                    "downloads": 722,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.25.json"
+                },
+                {
+                    "version": "4.0.26",
+                    "downloads": 402,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.26.json"
+                },
+                {
+                    "version": "4.0.27",
+                    "downloads": 788,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.27.json"
+                },
+                {
+                    "version": "4.0.28",
+                    "downloads": 460,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.28.json"
+                },
+                {
+                    "version": "4.0.29",
+                    "downloads": 13336,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.29.json"
+                },
+                {
+                    "version": "4.0.30",
+                    "downloads": 361,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.30.json"
+                },
+                {
+                    "version": "4.0.31",
+                    "downloads": 1052,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.31.json"
+                },
+                {
+                    "version": "4.0.32",
+                    "downloads": 259,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.32.json"
+                },
+                {
+                    "version": "4.0.33",
+                    "downloads": 210,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.33.json"
+                },
+                {
+                    "version": "4.0.34",
+                    "downloads": 1515,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.34.json"
+                },
+                {
+                    "version": "4.0.35",
+                    "downloads": 1007,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.35.json"
+                },
+                {
+                    "version": "4.0.36",
+                    "downloads": 260,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.36.json"
+                },
+                {
+                    "version": "4.0.37",
+                    "downloads": 712,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.37.json"
+                },
+                {
+                    "version": "4.0.38",
+                    "downloads": 1812,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.38.json"
+                },
+                {
+                    "version": "4.0.39",
+                    "downloads": 7060,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.39.json"
+                },
+                {
+                    "version": "4.0.40",
+                    "downloads": 713,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.40.json"
+                },
+                {
+                    "version": "4.0.41",
+                    "downloads": 307,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.41.json"
+                },
+                {
+                    "version": "4.0.42",
+                    "downloads": 12760,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.42.json"
+                },
+                {
+                    "version": "4.0.44",
+                    "downloads": 397,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.44.json"
+                },
+                {
+                    "version": "4.0.45",
+                    "downloads": 1185,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.45.json"
+                },
+                {
+                    "version": "4.0.46",
+                    "downloads": 322,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.46.json"
+                },
+                {
+                    "version": "4.0.47",
+                    "downloads": 1573,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.47.json"
+                },
+                {
+                    "version": "4.0.48",
+                    "downloads": 10604,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.0.48.json"
+                },
+                {
+                    "version": "4.1.14",
+                    "downloads": 428,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.1.14.json"
+                },
+                {
+                    "version": "4.1.15",
+                    "downloads": 297,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.1.15.json"
+                },
+                {
+                    "version": "4.1.16",
+                    "downloads": 0,
+                    "@id": "https://api.nuget.org/v3/registration5-semver1/scottplot/4.1.16.json"
+                }
+            ]
+        }
+    ]
+}
