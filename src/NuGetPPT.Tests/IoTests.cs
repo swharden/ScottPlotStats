@@ -14,8 +14,8 @@ namespace NuGetPPT.Tests
             var downloads = IO.FromJson(json);
             Assert.AreEqual(343, downloads.Count);
 
-            foreach (string ts in downloads.Keys)
-                Console.WriteLine($"{ts}\t{downloads[ts]}");
+            foreach (var d in downloads)
+                Console.WriteLine($"{d.Timestamp}\t{d.Downloads}");
         }
 
         [Test]
@@ -25,11 +25,10 @@ namespace NuGetPPT.Tests
             var downloads = IO.FromJson(json);
 
             var last = new DateTime();
-            foreach (string ts in downloads.Keys)
+            foreach (var d in downloads)
             {
-                DateTime dt = DateTime.Parse(ts);
-                Assert.Greater(dt, last);
-                last = dt;
+                Assert.Greater(d.DateTime, last);
+                last = d.DateTime;
             }
         }
 
@@ -38,7 +37,7 @@ namespace NuGetPPT.Tests
         {
             string jsonInput = SampleData.ReadSampleData("logs-scottplot.json");
 
-            Dictionary<string, int> records = IO.FromJson(jsonInput);
+            var records = IO.FromJson(jsonInput);
             string jsonOutput = IO.ToJson(records, "scottplot");
 
             Assert.AreEqual(jsonInput, jsonOutput);

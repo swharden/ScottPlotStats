@@ -12,18 +12,19 @@ namespace NuGetPPT
         /// <summary>
         /// Create a dictionary of timestamp:downloads from JSON
         /// </summary>
-        public static Dictionary<string, int> FromJson(string json)
+        public static List<DownloadRecord> FromJson(string json)
         {
             using JsonDocument document = JsonDocument.Parse(json);
             return document.RootElement.GetProperty("records")
                 .EnumerateObject()
-                .ToDictionary(x => x.Name, x => int.Parse(x.Value.ToString()));
+                .Select(x=>new DownloadRecord(x.Name, int.Parse(x.Value.ToString())))
+                .ToList();
         }
 
         /// <summary>
         /// Create JSON from a dictionary of timestamp:downloads
         /// </summary>
-        public static string ToJson(Dictionary<string, int> downloads, string packageName)
+        public static string ToJson(List<DownloadRecord> downloads, string packageName)
         {
             using var stream = new MemoryStream();
             using var writer = new Utf8JsonWriter(stream);
@@ -31,8 +32,8 @@ namespace NuGetPPT
             writer.WriteStartObject();
             writer.WriteString("package", packageName);
             writer.WriteStartObject("records");
-            foreach (string timestamp in downloads.Keys)
-                writer.WriteNumber(timestamp, downloads[timestamp]);
+            foreach (var d in downloads)
+                writer.WriteNumber(d.Timestamp, d.Downloads);
             writer.WriteEndObject();
             writer.WriteEndObject();
 
