@@ -7,6 +7,8 @@
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.8.4" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
+    <PackageReference Include="ScottPlot" Version="4.1.16" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
