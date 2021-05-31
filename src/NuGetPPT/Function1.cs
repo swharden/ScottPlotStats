@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,14 @@ namespace NuGetPPT
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
             // TODO: read this from a configuration file in blob storage?
-            string[] packageNames = { "scottplot", "scottplot.winforms", "scottplot.wpf", "scottplot.avalonia", "spectrogram", "fftsharp" };
+            string[] packageNames = {
+                "ScottPlot",
+                "ScottPlot.WinForms",
+                "ScottPlot.WPF",
+                "ScottPlot.Avalonia",
+                "Spectrogram",
+                "FftSharp"
+            };
 
             string storageConnectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage", EnvironmentVariableTarget.Process);
             BlobContainerClient container = new(storageConnectionString, "$web");
@@ -32,13 +40,14 @@ namespace NuGetPPT
                 int newDownloads = NuGetApi.ReadTotalDownloads(NuGetApi.RequestJson(packageName));
                 if (oldDownloads == newDownloads)
                 {
-                    Console.WriteLine($"{packageName} download count has not changed");
+                    Console.WriteLine($" - {packageName} download count has not changed");
                 }
                 else
                 {
-                    Console.WriteLine($"{packageName} now has {newDownloads} downloads");
+                    Console.WriteLine($" - {packageName} now has {newDownloads} downloads");
                     records.Add(new DownloadRecord(DateTime.UtcNow.ToString(), newDownloads));
                     SaveRecords(container, packageName, records);
+                    SavePlot(container, packageName, records);
                 }
                 Console.WriteLine();
             }
@@ -46,7 +55,7 @@ namespace NuGetPPT
 
         private static List<DownloadRecord> LoadRecords(BlobContainerClient container, string packageName)
         {
-            string fileName = $"logs/{packageName}.json";
+            string fileName = $"logs/{packageName.ToLower()}.json";
             BlobClient blob = container.GetBlobClient(fileName);
             if (!blob.Exists())
                 throw new InvalidOperationException($"file not found: {fileName}");
@@ -58,12 +67,26 @@ namespace NuGetPPT
 
         private static void SaveRecords(BlobContainerClient container, string packageName, List<DownloadRecord> records)
         {
-            string fileName = $"logs/{packageName}.json";
+            string fileName = $"logs/{packageName.ToLower()}.json";
             BlobClient blob = container.GetBlobClient(fileName);
             string json = IO.ToJson(records, packageName);
             byte[] bytes = Encoding.UTF8.GetBytes(json);
             using var stream = new MemoryStream(bytes, writable: false);
             blob.Upload(stream, overwrite: true);
+            stream.Close();
+        }
+
+        private static void SavePlot(BlobContainerClient container, string packageName, List<DownloadRecord> records)
+        {
+            string fileName = $"plots/{packageName.ToLower()}.png";
+            Console.WriteLine($" - uploading {fileName}");
+            BlobClient blob = container.GetBlobClient(fileName);
+            var bmp = Plotting.MakePlot(packageName, records);
+            byte[] bytes = Plotting.GetPngBytes(bmp);
+            using var stream = new MemoryStream(bytes, writable: false);
+            blob.Upload(stream, overwrite: true);
+            BlobHttpHeaders pngHeaders = new() { ContentType = "image/png", ContentLanguage = "en-us", };
+            blob.SetHttpHeaders(pngHeaders);
             stream.Close();
         }
     }
