@@ -31,7 +31,7 @@ def saveRecords(records):
     for record in records:
         lines.append(f'"{record.timestamp}":{record.downloads}')
     thisFolder = pathlib.Path(__file__).parent
-    saveFilePath = thisFolder.joinpath(f"logs-{packageName}.json")
+    saveFilePath = thisFolder.joinpath(f"{packageName}.json")
     recordsJson = "{" + ",".join(lines) + "}"
     json = "{" + f'"package":"{packageName}","records":{recordsJson}' + "}"
     with open(saveFilePath, 'w') as f:
