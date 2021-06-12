@@ -45,7 +45,7 @@ namespace NuGetPPT
                 else
                 {
                     Console.WriteLine($" - {packageName} now has {newDownloads} downloads");
-                    records.Add(new DownloadRecord(DateTime.UtcNow.ToString(), newDownloads));
+                    records.Add(new DownloadRecord(DateTime.UtcNow.ToString("o"), newDownloads));
                     SaveRecords(container, packageName, records);
                     SavePlot(container, packageName, records);
                 }
