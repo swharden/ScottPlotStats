@@ -21,7 +21,7 @@ namespace NuGetPPT
 
             string day = DateTime.UtcNow.ToString("yyyy-MM-dd");
             string time = DateTime.UtcNow.ToString("H:mm");
-            var dateAnnotation = plt.AddAnnotation($"updated {day} at {time} UTC", -3, -1);
+            var dateAnnotation = plt.AddAnnotation($"{ys.Last():N0} downloads as of {day} ({time} UTC)", -3, -1);
             dateAnnotation.Border = false;
             dateAnnotation.Shadow = false;
             dateAnnotation.Background = false;
