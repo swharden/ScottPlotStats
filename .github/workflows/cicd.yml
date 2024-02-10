@@ -9,23 +9,18 @@ env:
   AZURE_FUNCTIONAPP_NAME: ScottPlotStatsFunctions20240210172317
   AZURE_FUNCTIONAPP_PACKAGE_PATH: src/ScottPlotStats.Functions/published
   CONFIGURATION: Release
-  DOTNET_CORE_VERSION: 8.0.x
+  DOTNET_VERSION: 8.0.x
   WORKING_DIRECTORY: src/ScottPlotStats.Functions
-  DOTNET_CORE_VERSION_INPROC: 6.0.x
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup .NET SDK
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-      - name: Setup .NET Core (for inproc extensions)
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_CORE_VERSION_INPROC }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Restore
         run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
       - name: Build
