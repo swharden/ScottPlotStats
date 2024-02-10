@@ -4,11 +4,12 @@ using Microsoft.Extensions.Logging;
 
 namespace ScottPlotStats.Functions;
 
-public class Function1(ILoggerFactory loggerFactory)
+public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
 {
-    private readonly ILogger Logger = loggerFactory.CreateLogger<Function1>();
+    private readonly ILogger Logger = loggerFactory.CreateLogger<UpdateNugetStatsFunction>();
+    private const string DB_FILENAME = "scottplot.csv";
 
-    [Function("Function1")]
+    [Function("UpdateNugetStatsFunction")]
     public void Run(
 #if DEBUG
     [TimerTrigger("0 0 0 1 1 0", RunOnStartup = true)] TimerInfo myTimer
@@ -40,7 +41,7 @@ public class Function1(ILoggerFactory loggerFactory)
     private CountDatabase LoadDatabaseFromFile(BlobContainerClient containerClient)
     {
         Logger.LogInformation("Downloading existing records from CSV file...");
-        BlobClient blobClient = containerClient.GetBlobClient("scottplot.csv");
+        BlobClient blobClient = containerClient.GetBlobClient(DB_FILENAME);
         using MemoryStream memoryStream = new();
         blobClient.DownloadTo(memoryStream);
         string contentString = System.Text.Encoding.UTF8.GetString(memoryStream.ToArray());
@@ -66,7 +67,7 @@ public class Function1(ILoggerFactory loggerFactory)
         Logger.LogInformation("Writing {LENGTH} bytes...", bytes.Length);
 
         MemoryStream ms = new(bytes);
-        BlobClient blobClient = containerClient.GetBlobClient("scottplot-test.txt");
+        BlobClient blobClient = containerClient.GetBlobClient(DB_FILENAME);
         blobClient.Upload(ms, overwrite: true);
         Logger.LogInformation("Upload complete.");
     }
