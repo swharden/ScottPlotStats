@@ -7,10 +7,10 @@ on:
 
 env:
   AZURE_FUNCTIONAPP_NAME: ScottPlotStatsFunctions20240210172317
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: ScottPlotStats.Functions/published
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: src/ScottPlotStats.Functions/published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
-  WORKING_DIRECTORY: ScottPlotStats.Functions
+  WORKING_DIRECTORY: src/ScottPlotStats.Functions
   DOTNET_CORE_VERSION_INPROC: 6.0.x
 
 jobs:
