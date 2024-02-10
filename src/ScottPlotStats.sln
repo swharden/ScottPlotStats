@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScottPlotStats.Test", "Scot
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScottPlotStats", "ScottPlotStats\ScottPlotStats.csproj", "{4150CD72-F922-454E-BC78-CCAA53AA6C4E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScottPlotStats.Functions", "ScottPlotStats.Functions\ScottPlotStats.Functions.csproj", "{330206D7-9473-456D-8F51-ECBD68206BB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{4150CD72-F922-454E-BC78-CCAA53AA6C4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4150CD72-F922-454E-BC78-CCAA53AA6C4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4150CD72-F922-454E-BC78-CCAA53AA6C4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{330206D7-9473-456D-8F51-ECBD68206BB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{330206D7-9473-456D-8F51-ECBD68206BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{330206D7-9473-456D-8F51-ECBD68206BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{330206D7-9473-456D-8F51-ECBD68206BB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

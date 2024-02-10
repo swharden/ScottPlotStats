@@ -1,32 +1,26 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace ScottPlotStats;
 
 public static class NuGetAPI
 {
-    public static int GetDownloadCount(string packageName)
+    public static CountRecord GetPrimaryCount(string packageName = "scottplot")
     {
-        // TODO: try/catch?
-        Stopwatch sw1 = Stopwatch.StartNew();
-        int primary = GetDownloadCount(packageName, true);
-        Console.WriteLine($"Primary: {primary:N0} ({sw1.Elapsed.TotalMilliseconds:N0} ms)");
-
-        Stopwatch sw2 = Stopwatch.StartNew();
-        int secondary = GetDownloadCount(packageName, false);
-        Console.WriteLine($"Secondary: {secondary:N0} ({sw2.Elapsed.TotalMilliseconds:N0} ms)");
-
-        return Math.Max(primary, secondary);
+        // URL from https://api.nuget.org/v3/index.json
+        int count = GetDownloadCount("https://azuresearch-usnc.nuget.org/query", packageName);
+        return new CountRecord(DateTime.UtcNow.ToUniversalTime(), 1, count);
     }
 
-    private static int GetDownloadCount(string packageName, bool primary)
+    public static CountRecord GetSecondaryCount(string packageName = "scottplot")
     {
-        string urlBase = primary
-            ? "https://azuresearch-usnc.nuget.org/query"
-            : "https://azuresearch-ussc.nuget.org/query";
+        // URL from https://api.nuget.org/v3/index.json
+        int count = GetDownloadCount("https://azuresearch-ussc.nuget.org/query", packageName);
+        return new CountRecord(DateTime.UtcNow.ToUniversalTime(), 2, count);
+    }
 
-        string url = $"{urlBase}?take=1&q={packageName}";
-
+    private static int GetDownloadCount(string baseUrl, string packageName)
+    {
+        string url = $"{baseUrl}?take=1&q={packageName}";
         JsonDocument doc = RequestJson(url);
         return doc
             .RootElement

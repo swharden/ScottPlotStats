@@ -4,21 +4,20 @@ namespace ScottPlotStats.Test;
 public class NuGetApiTests
 {
     [TestMethod]
-    public void Test_DownloadCount()
+    public void Test_NuGetAPI_GetCount()
     {
-        int count = NuGetAPI.GetDownloadCount("ScottPlot");
-        count.Should().BeGreaterThan(900_000);
+        var primaryRecord = NuGetAPI.GetPrimaryCount();
+        primaryRecord.Count.Should().BeGreaterThan(900_000);
     }
 
     [TestMethod]
-    public void Test_Database_Load()
+    public void Test_Database_LoadFromCsv()
     {
         string CSV_FILE = "../../../../../dev/SampleData/scottplot-2024-02-10.csv";
         string txt = File.ReadAllText(CSV_FILE);
-        var records = Database.GetRecords(txt);
-        records.Should().NotBeNullOrEmpty();
-        records.Count.Should().BeGreaterThan(1900);
-        records.Last().Count.Should().BeGreaterThan(900_000);
-        Console.WriteLine(records.Last());
+        CountDatabase db = CountDatabase.FromCsv(txt);
+        Console.WriteLine(db);
+        db.Count.Should().BeGreaterThan(1900);
+        db.HighestCount.Should().BeGreaterThan(900_000);
     }
 }
