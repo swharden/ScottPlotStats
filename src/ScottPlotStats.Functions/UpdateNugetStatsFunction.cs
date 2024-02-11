@@ -27,7 +27,7 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
             CountDatabase db = LoadDatabaseFromFile(containerClient);
             db.AddRecord(NuGetAPI.GetPrimaryCount());
             db.AddRecord(NuGetAPI.GetSecondaryCount());
-            if (db.NewRecordCount > 0)
+            if (db.NewRecordCount == 0)
             {
                 Logger.LogInformation("The database is already up to date. No action is required.");
             }
