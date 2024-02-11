@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -69,6 +70,7 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
         using MemoryStream ms = new(bytes);
         BlobClient blobClient = containerClient.GetBlobClient(DB_FILENAME);
         blobClient.Upload(ms, overwrite: true);
+        blobClient.SetHttpHeaders(new BlobHttpHeaders() { ContentType = "text/plain" });
         Logger.LogInformation("Upload complete.");
     }
 
@@ -79,6 +81,7 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
         Logger.LogInformation("Uploading {LENGTH} byte image file...", bytes1.Length);
         using MemoryStream ms1 = new(bytes1);
         BlobClient blobClient1 = containerClient.GetBlobClient("scottplot-download-count.png");
+        blobClient1.SetHttpHeaders(new BlobHttpHeaders() { ContentType = "image/png" });
         blobClient1.Upload(ms1, overwrite: true);
 
         Logger.LogInformation("Plotting download rate...");
@@ -86,6 +89,7 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
         Logger.LogInformation("Uploading {LENGTH} byte image file...", bytes2.Length);
         using MemoryStream ms2 = new(bytes2);
         BlobClient blobClient2 = containerClient.GetBlobClient("scottplot-download-rate.png");
+        blobClient2.SetHttpHeaders(new BlobHttpHeaders() { ContentType = "image/png" });
         blobClient2.Upload(ms2, overwrite: true);
     }
 }
