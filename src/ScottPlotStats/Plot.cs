@@ -45,6 +45,10 @@ public static class Plot
         foreach (var record in db.GetRecords())
         {
             int index = (record.Date - firstBin).Days / binSize.Days;
+
+            if (index >= binCounts.Length)
+                continue;
+
             if (record.Count > binCounts[index])
                 binCounts[index] = record.Count;
         }
