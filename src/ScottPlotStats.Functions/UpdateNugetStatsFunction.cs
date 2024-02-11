@@ -23,7 +23,7 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
         db.AddRecord(NuGetAPI.GetPrimaryCount());
         db.AddRecord(NuGetAPI.GetSecondaryCount());
         SaveDatabaseToFile(db, containerClient);
-        // TODO: update plot from database
+        CreatePlots(db, containerClient);
         Logger.LogInformation("Function complete.");
     }
 
@@ -66,9 +66,26 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(txt);
         Logger.LogInformation("Writing {LENGTH} bytes...", bytes.Length);
 
-        MemoryStream ms = new(bytes);
+        using MemoryStream ms = new(bytes);
         BlobClient blobClient = containerClient.GetBlobClient(DB_FILENAME);
         blobClient.Upload(ms, overwrite: true);
         Logger.LogInformation("Upload complete.");
+    }
+
+    private void CreatePlots(CountDatabase db, BlobContainerClient containerClient)
+    {
+        Logger.LogInformation("Plotting download count...");
+        byte[] bytes1 = Plot.DownloadCount(db, 600, 350);
+        Logger.LogInformation("Uploading {LENGTH} byte image file...", bytes1.Length);
+        using MemoryStream ms1 = new(bytes1);
+        BlobClient blobClient1 = containerClient.GetBlobClient("scottplot-download-count.png");
+        blobClient1.Upload(ms1, overwrite: true);
+
+        Logger.LogInformation("Plotting download rate...");
+        byte[] bytes2 = Plot.DownloadRate(db, 600, 350);
+        Logger.LogInformation("Uploading {LENGTH} byte image file...", bytes2.Length);
+        using MemoryStream ms2 = new(bytes2);
+        BlobClient blobClient2 = containerClient.GetBlobClient("scottplot-download-rate.png");
+        blobClient2.Upload(ms2, overwrite: true);
     }
 }
