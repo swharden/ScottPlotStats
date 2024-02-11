@@ -13,8 +13,23 @@ env:
   CONFIGURATION: Release
   DOTNET_VERSION: 8.0.x
   WORKING_DIRECTORY: src/ScottPlotStats.Functions
+  TEST_DIRECTORY: src/ScottPlotStats.Test
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Restore
+        run: dotnet restore "${{ env.TEST_DIRECTORY }}"
+      - name: Build
+        run: dotnet build "${{ env.TEST_DIRECTORY }}" --no-restore
+      - name: Test
+        run: dotnet test "${{ env.TEST_DIRECTORY }}" --no-build
   build:
     runs-on: ubuntu-latest
     steps:
