@@ -6,6 +6,6 @@
 
 <div align="center">
 
-<a href="https://scottplotstatsstorage.z20.web.core.windows.net/scottplot-download-count.png"><img src="https://scottplotstatsstorage.z20.web.core.windows.net/scottplot-download-count.png"></a>
+<a href="https://scottplotstatsstorage.z20.web.core.windows.net/scottplot-download-count.png?nocache"><img src="https://scottplotstatsstorage.z20.web.core.windows.net/scottplot-download-count.png?nocache"></a>
 
 </div>
