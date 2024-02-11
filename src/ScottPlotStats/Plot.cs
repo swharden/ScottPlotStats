@@ -19,7 +19,7 @@ public static class Plot
         var sp = plot.Add.Scatter(dates, counts);
         sp.MarkerSize = 0;
         sp.LineWidth = 2;
-        plot.Title("ScottPlot Nuget Package Total Downloads");
+        plot.Title("ScottPlot NuGet Package Total Downloads");
         plot.Axes.Top.MaximumSize = 10;
         plot.Axes.DateTimeTicksBottom();
 
@@ -61,17 +61,30 @@ public static class Plot
         }
 
         // calculate acceleration by week
-        int[] binCountDeltas = new int[binTimes.Length];
+        double[] binCountDeltas = new double[binTimes.Length];
         for (int i = 1; i < binCounts.Length; i++)
         {
             binCountDeltas[i] = binCounts[i] - binCounts[i - 1];
         }
 
         ScottPlot.Plot plot = new();
-        var sp = plot.Add.Scatter(binTimes, binCountDeltas);
-        sp.MarkerSize = 0;
-        sp.LineWidth = 2;
-        plot.Title("ScottPlot Nuget Package Downloads per Week");
+
+        var sp1 = plot.Add.Scatter(binTimes, binCountDeltas);
+        sp1.MarkerSize = 0;
+        sp1.LineWidth = 2;
+        sp1.Color = sp1.Color.WithAlpha(.3);
+        sp1.Label = "Rate by Week";
+
+        double[] sma = ScottPlot.Statistics.Series.MovingAverage(binCountDeltas, window: 12, preserveLength: true);
+        sma = sma.Select(x => double.IsNaN(x) ? 0 : x).ToArray();
+        var sp2 = plot.Add.Scatter(binTimes, sma);
+        sp2.MarkerSize = 0;
+        sp2.LineWidth = 2;
+        sp2.Color = sp1.Color.WithAlpha(255);
+        sp2.Label = "3 Month Average";
+
+        plot.ShowLegend(ScottPlot.Alignment.UpperLeft);
+        plot.Title("ScottPlot NuGet Package Downloads per Week");
         plot.Axes.Top.MaximumSize = 10;
         plot.Axes.DateTimeTicksBottom();
 
