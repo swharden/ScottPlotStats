@@ -25,16 +25,9 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
         {
             BlobContainerClient containerClient = GetBlobContainer();
             CountDatabase db = LoadDatabaseFromFile(containerClient);
-            db.AddRecord(NuGetAPI.GetPrimaryCount());
-            db.AddRecord(NuGetAPI.GetSecondaryCount());
-            Logger.LogInformation("Database has {COUNT} new records.", db.NewRecordCount);
-
-            bool alwaysUpdate = true; // disable this after testing is complete
-            if (db.NewRecordCount > 0 || alwaysUpdate)
-            {
-                SaveDatabaseToFile(db, containerClient);
-                CreatePlots(db, containerClient);
-            }
+            UpdateDatabaseWithLatestCounts(db);
+            SaveDatabaseToFile(db, containerClient);
+            CreatePlots(db, containerClient);
         }
         catch (Exception ex)
         {
@@ -72,8 +65,21 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
         return db;
     }
 
+    private void UpdateDatabaseWithLatestCounts(CountDatabase db)
+    {
+        db.AddRecord(NuGetAPI.GetPrimaryCount());
+        db.AddRecord(NuGetAPI.GetSecondaryCount());
+        Logger.LogInformation("Database has {COUNT} new records.", db.NewRecordCount);
+    }
+
     private void SaveDatabaseToFile(CountDatabase db, BlobContainerClient containerClient)
     {
+        if (db.NewRecordCount == 0)
+        {
+            Logger.LogInformation("Database contains no updated records so the file will not be modified.");
+            return;
+        }
+
         string txt = db.ToCSV();
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(txt);
         Logger.LogInformation("Writing {LENGTH} bytes...", bytes.Length);
@@ -82,25 +88,30 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
         BlobClient blobClient = containerClient.GetBlobClient(DB_FILENAME);
         blobClient.Upload(ms, overwrite: true);
         blobClient.SetHttpHeaders(new BlobHttpHeaders() { ContentType = "text/plain" });
-        Logger.LogInformation("Upload complete.");
     }
 
     private void CreatePlots(CountDatabase db, BlobContainerClient containerClient)
     {
+        if (db.NewRecordCount == 0)
+        {
+            Logger.LogInformation("Database contains no updated records so plots will not be updated.");
+            return;
+        }
+
         Logger.LogInformation("Plotting download count...");
         byte[] bytes1 = Plot.DownloadCount(db, 600, 350);
         Logger.LogInformation("Uploading {LENGTH} byte image file...", bytes1.Length);
         using MemoryStream ms1 = new(bytes1);
         BlobClient blobClient1 = containerClient.GetBlobClient("scottplot-download-count.png");
-        blobClient1.SetHttpHeaders(new BlobHttpHeaders() { ContentType = "image/png" });
         blobClient1.Upload(ms1, overwrite: true);
+        blobClient1.SetHttpHeaders(new BlobHttpHeaders() { ContentType = "image/png" });
 
         Logger.LogInformation("Plotting download rate...");
         byte[] bytes2 = Plot.DownloadRate(db, 600, 350);
         Logger.LogInformation("Uploading {LENGTH} byte image file...", bytes2.Length);
         using MemoryStream ms2 = new(bytes2);
         BlobClient blobClient2 = containerClient.GetBlobClient("scottplot-download-rate.png");
-        blobClient2.SetHttpHeaders(new BlobHttpHeaders() { ContentType = "image/png" });
         blobClient2.Upload(ms2, overwrite: true);
+        blobClient2.SetHttpHeaders(new BlobHttpHeaders() { ContentType = "image/png" });
     }
 }
