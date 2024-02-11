@@ -2,6 +2,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace ScottPlotStats.Functions;
 
@@ -9,6 +10,7 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
 {
     private readonly ILogger Logger = loggerFactory.CreateLogger<UpdateNugetStatsFunction>();
     private const string DB_FILENAME = "scottplot.csv";
+    private readonly Stopwatch SW = Stopwatch.StartNew();
 
     [Function("UpdateNugetStatsFunction")]
     public void Run(
@@ -19,13 +21,24 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
 #endif
         )
     {
-        BlobContainerClient containerClient = GetBlobContainer();
-        CountDatabase db = LoadDatabaseFromFile(containerClient);
-        db.AddRecord(NuGetAPI.GetPrimaryCount());
-        db.AddRecord(NuGetAPI.GetSecondaryCount());
-        SaveDatabaseToFile(db, containerClient);
-        CreatePlots(db, containerClient);
-        Logger.LogInformation("Function complete.");
+        try
+        {
+            BlobContainerClient containerClient = GetBlobContainer();
+            CountDatabase db = LoadDatabaseFromFile(containerClient);
+            db.AddRecord(NuGetAPI.GetPrimaryCount());
+            db.AddRecord(NuGetAPI.GetSecondaryCount());
+            SaveDatabaseToFile(db, containerClient);
+            CreatePlots(db, containerClient);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Exception thrown during stats update");
+            throw;
+        }
+        finally
+        {
+            Logger.LogInformation("Function execution completed in {TIME} seconds", SW.Elapsed.TotalSeconds);
+        }
     }
 
     private BlobContainerClient GetBlobContainer()

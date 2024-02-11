@@ -1,6 +1,4 @@
-﻿using System.Runtime.Versioning;
-
-namespace ScottPlotStats;
+﻿namespace ScottPlotStats;
 
 public static class Plot
 {
