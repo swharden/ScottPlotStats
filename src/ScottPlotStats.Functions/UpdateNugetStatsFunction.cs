@@ -27,13 +27,11 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
             CountDatabase db = LoadDatabaseFromFile(containerClient);
             db.AddRecord(NuGetAPI.GetPrimaryCount());
             db.AddRecord(NuGetAPI.GetSecondaryCount());
-            if (db.NewRecordCount == 0)
+            Logger.LogInformation("Database has {COUNT} new records.", db.NewRecordCount);
+
+            bool alwaysUpdate = true; // disable this after testing is complete
+            if (db.NewRecordCount > 0 || alwaysUpdate)
             {
-                Logger.LogInformation("The database is already up to date. No action is required.");
-            }
-            else
-            {
-                Logger.LogInformation("The database has {COUNT} new records.", db.NewRecordCount);
                 SaveDatabaseToFile(db, containerClient);
                 CreatePlots(db, containerClient);
             }
