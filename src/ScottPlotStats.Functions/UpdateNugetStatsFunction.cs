@@ -27,8 +27,16 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
             CountDatabase db = LoadDatabaseFromFile(containerClient);
             db.AddRecord(NuGetAPI.GetPrimaryCount());
             db.AddRecord(NuGetAPI.GetSecondaryCount());
-            SaveDatabaseToFile(db, containerClient);
-            CreatePlots(db, containerClient);
+            if (db.NewRecordCount > 0)
+            {
+                Logger.LogInformation("The database is already up to date. No action is required.");
+            }
+            else
+            {
+                Logger.LogInformation("The database has {COUNT} new records.", db.NewRecordCount);
+                SaveDatabaseToFile(db, containerClient);
+                CreatePlots(db, containerClient);
+            }
         }
         catch (Exception ex)
         {
@@ -68,14 +76,6 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
 
     private void SaveDatabaseToFile(CountDatabase db, BlobContainerClient containerClient)
     {
-        Logger.LogInformation("Database contains {COUNT} new records.", db.NewRecordCount);
-
-        if (db.NewRecordCount == 0)
-        {
-            Logger.LogInformation("Database has no new records so it will not be updated.");
-            return;
-        }
-
         string txt = db.ToCSV();
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(txt);
         Logger.LogInformation("Writing {LENGTH} bytes...", bytes.Length);
