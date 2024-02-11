@@ -9,6 +9,7 @@ public class CountDatabase
     public int Count => Records.Count;
     public int NewRecordCount => Count - InitialCount;
     public int HighestCount => Records.Select(x => x.Count).Max();
+    public CountRecord[] GetRecords() => Records.ToArray();
 
     private CountDatabase()
     {
