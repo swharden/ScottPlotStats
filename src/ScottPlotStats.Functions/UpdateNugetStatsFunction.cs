@@ -3,6 +3,9 @@ using Azure.Storage.Blobs.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Text.Json;
 
 namespace ScottPlotStats.Functions;
 
@@ -10,6 +13,7 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
 {
     private readonly ILogger Logger = loggerFactory.CreateLogger<UpdateNugetStatsFunction>();
     private const string DB_FILENAME = "scottplot.csv";
+    private const string LOG_FILENAME = "scottplot-log.json";
     private readonly Stopwatch SW = Stopwatch.StartNew();
 
     [Function("UpdateNugetStatsFunction")]
@@ -28,6 +32,7 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
             UpdateDatabaseWithLatestCounts(db);
             SaveDatabaseToFile(db, containerClient);
             CreatePlots(db, containerClient);
+            CreateLogFile(db, containerClient);
         }
         catch (Exception ex)
         {
@@ -61,7 +66,7 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
         Logger.LogInformation("Read {LENGTH} bytes.", contentString.Length);
 
         CountDatabase db = CountDatabase.FromCsv(contentString);
-        Logger.LogInformation("Created database containing {COUNT} records.", db.Count);
+        Logger.LogInformation("Created database containing {COUNT} records.", db.RecordCount);
         return db;
     }
 
@@ -113,5 +118,26 @@ public class UpdateNugetStatsFunction(ILoggerFactory loggerFactory)
         BlobClient blobClient2 = containerClient.GetBlobClient("scottplot-download-rate.png");
         blobClient2.Upload(ms2, overwrite: true);
         blobClient2.SetHttpHeaders(new BlobHttpHeaders() { ContentType = "image/png" });
+    }
+
+    private void CreateLogFile(CountDatabase db, BlobContainerClient containerClient)
+    {
+        using MemoryStream ms1 = new();
+        JsonWriterOptions options = new() { Indented = true };
+        using Utf8JsonWriter writer = new(ms1, options);
+        writer.WriteStartObject();
+        writer.WriteString("updated", DateTime.Now.ToUniversalTime().ToString("o"));
+        writer.WriteString("last-new-record", db.GetRecords().Last().Date.ToUniversalTime().ToString("o"));
+        writer.WriteNumber("total", db.HighestCount);
+        writer.WriteEndObject();
+        writer.Flush();
+        writer.Flush();
+        byte[] bytes = ms1.ToArray();
+
+        Logger.LogInformation("Writing {LENGTH} byte log file...", bytes.Length);
+        using MemoryStream ms2 = new(bytes);
+        BlobClient blobClient = containerClient.GetBlobClient(LOG_FILENAME);
+        blobClient.Upload(ms2, overwrite: true);
+        blobClient.SetHttpHeaders(new BlobHttpHeaders() { ContentType = "text/plain" });
     }
 }

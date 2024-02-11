@@ -6,8 +6,8 @@ public class CountDatabase
 {
     private readonly List<CountRecord> Records = [];
     private int InitialCount;
-    public int Count => Records.Count;
-    public int NewRecordCount => Count - InitialCount;
+    public int RecordCount => Records.Count;
+    public int NewRecordCount => RecordCount - InitialCount;
     public int HighestCount => Records.Select(x => x.Count).Max();
     public CountRecord[] GetRecords() => Records.ToArray();
 
@@ -27,7 +27,7 @@ public class CountDatabase
 
     public override string ToString()
     {
-        return $"Database with {Count} records ({Count - InitialCount} new ones)";
+        return $"Database with {RecordCount} records ({RecordCount - InitialCount} new ones)";
     }
 
     public void AddRecord(CountRecord newRecord)
