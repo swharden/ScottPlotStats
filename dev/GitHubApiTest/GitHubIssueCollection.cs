@@ -41,4 +41,34 @@ public class GitHubIssueCollection
         collection.AddRange(issues);
         return collection;
     }
+
+    public Dictionary<DateOnly, List<GitHubIssue>> GetIssuesByDay()
+    {
+        DateTime start = Issues.OrderBy(x => x.DateTimeStart).First().DateTimeStart;
+        DateTime end = Issues.OrderBy(x => x.DateTimeEnd).Last().DateTimeEnd;
+        DateOnly startDay = DateOnly.FromDateTime(start);
+        DateOnly endDay = DateOnly.FromDateTime(end);
+
+        Dictionary<DateOnly, List<GitHubIssue>> issuesByDay = [];
+        DateOnly binDay = startDay;
+        while (binDay <= endDay)
+        {
+            issuesByDay[binDay] = [];
+            binDay = binDay.AddDays(1);
+        }
+
+        foreach (var issue in Issues)
+        {
+            DateOnly openDay = DateOnly.FromDateTime(issue.DateTimeStart);
+            DateOnly closeDay = DateOnly.FromDateTime(issue.DateTimeEnd);
+            DateOnly issueDay = openDay;
+            while (issueDay <= closeDay)
+            {
+                issuesByDay[issueDay].Add(issue);
+                issueDay = issueDay.AddDays(1);
+            }
+        }
+
+        return issuesByDay;
+    }
 }
