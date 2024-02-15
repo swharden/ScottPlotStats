@@ -5,9 +5,8 @@ internal class PlottingTests
     [Test]
     public void Test_Plot_CountOverTime()
     {
-        string body = File.ReadAllText("../../../SampleData/issues.json");
+        GitHubIssueCollection issues = SampleData.IssueCollection;
 
-        GitHubIssueCollection issues = GitHubIssueCollection.FromJson(body);
         Assert.That(issues, Is.Not.Empty);
 
         List<DateTime> dates = [];

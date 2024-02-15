@@ -12,19 +12,16 @@ public class Tests
     public void Test_FetchIssuesFromGitHub()
     {
         GitHubDataFetcher api = new("scottplot", "scottplot");
-        GitHubIssueCollection issues = api.GetIssues();
+        GitHubIssueCollection issues = api.GetIssues(3);
         Assert.That(issues, Is.Not.Empty);
         Console.WriteLine($"Finished loading {issues.Count:N0} issues.");
-        File.WriteAllText("issues.json", issues.ToJson());
     }
 
     [Test]
     public void Test_ParseIssueJson()
     {
-        string body = File.ReadAllText("../../../SampleData/issue-page-1.json");
-
         GitHubIssueCollection issues = new();
-        issues.AddRangeFromJson(body);
+        issues.AddRangeFromJson(SampleData.IssuePageJson);
         Assert.That(issues, Is.Not.Empty);
 
         foreach (var issue in issues.GetIssues())
@@ -36,9 +33,8 @@ public class Tests
     [Test]
     public void Test_IssuesToJson()
     {
-        string body = File.ReadAllText("../../../SampleData/issue-page-1.json");
         GitHubIssueCollection issues1 = new();
-        issues1.AddRangeFromJson(body);
+        issues1.AddRangeFromJson(SampleData.IssuePageJson);
         string json = issues1.ToJson();
         Assert.That(json.Length, Is.GreaterThan(1000));
 
