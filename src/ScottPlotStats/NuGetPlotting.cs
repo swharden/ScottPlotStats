@@ -1,8 +1,8 @@
 ﻿namespace ScottPlotStats;
 
-public static class Plot
+public static class NuGetPlotting
 {
-    public static byte[] DownloadCount(CountDatabase db, int width, int height)
+    public static ScottPlot.Plot DownloadCount(CountDatabase db)
     {
         List<DateTime> dates = [];
         List<int> counts = [];
@@ -23,10 +23,10 @@ public static class Plot
         plot.Axes.Top.MaximumSize = 10;
         plot.Axes.DateTimeTicksBottom();
 
-        return plot.GetImageBytes(width, height, ScottPlot.ImageFormat.Png);
+        return plot;
     }
 
-    public static byte[] DownloadRate(CountDatabase db, int width, int height)
+    public static ScottPlot.Plot DownloadRate(CountDatabase db)
     {
         // create time bins
         TimeSpan binSize = TimeSpan.FromDays(7);
@@ -88,6 +88,6 @@ public static class Plot
         plot.Axes.Top.MaximumSize = 10;
         plot.Axes.DateTimeTicksBottom();
 
-        return plot.GetImageBytes(width, height, ScottPlot.ImageFormat.Png);
+        return plot;
     }
 }

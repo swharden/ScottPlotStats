@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Collections;
+using System.Text;
+using System.Text.Json;
 
 namespace ScottPlotStats;
 
@@ -74,5 +76,21 @@ public class CountDatabase
             sb.AppendLine(record.ToCsvLine());
         }
         return sb.ToString();
+    }
+
+    public string GetLogJson()
+    {
+        using MemoryStream ms1 = new();
+        JsonWriterOptions options = new() { Indented = true };
+        using Utf8JsonWriter writer = new(ms1, options);
+        writer.WriteStartObject();
+        writer.WriteString("updated", DateTime.Now.ToUniversalTime().ToString("o"));
+        writer.WriteString("last-new-record", GetRecords().Last().Date.ToUniversalTime().ToString("o"));
+        writer.WriteNumber("total", HighestCount);
+        writer.WriteEndObject();
+        writer.Flush();
+        writer.Flush();
+        byte[] bytes = ms1.ToArray();
+        return Encoding.UTF8.GetString(bytes);
     }
 }
