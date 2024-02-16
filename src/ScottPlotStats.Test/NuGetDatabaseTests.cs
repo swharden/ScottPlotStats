@@ -1,7 +1,7 @@
 ﻿namespace ScottPlotStats.Test;
 
 [TestClass]
-public class DatabaseTests
+public class NuGetDatabaseTests
 {
     [TestMethod]
     public void Test_Database_LoadFromCsv()

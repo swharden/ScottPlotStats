@@ -1,7 +1,7 @@
 ﻿namespace ScottPlotStats.Test;
 
 [TestClass]
-public class PlottingTests
+public class NuGetPlottingTests
 {
     [TestMethod]
     public void Test_Plot_CountsOverTime()
