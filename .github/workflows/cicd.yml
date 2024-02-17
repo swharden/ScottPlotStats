@@ -31,7 +31,7 @@ jobs:
         run: dotnet build "${{ env.TEST_DIRECTORY }}" --no-restore
       - name: Test
         env:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GH_TOKEN }}
         run: dotnet test "${{ env.TEST_DIRECTORY }}" --no-build
   build:
     runs-on: ubuntu-latest
