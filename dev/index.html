@@ -24,7 +24,9 @@
 
 <body>
     <div class="text-center my-5">
-        <h1>ScottPlot NuGet Package Statistics</h1>
+        <h1>ScottPlot NuGet Downloads</h1>
+        <div id="nuget-details" class="text-center">
+        </div>
         <div class="my-5">
             <a href="https://scottplotstatsstorage.z20.web.core.windows.net/scottplot-download-count.png">
                 <img src="https://scottplotstatsstorage.z20.web.core.windows.net/scottplot-download-count.png"
@@ -37,38 +39,55 @@
                     class="mx-auto">
             </a>
         </div>
-        <div id="nuget-details" class="text-center">
+    </div>
+
+    <div class="text-center my-5">
+        <h1>ScottPlot GitHub Stars</h1>
+        <div id="star-details" class="text-center">
+        </div>
+        <div class="my-5">
+            <a href="https://scottplotstatsstorage.z20.web.core.windows.net/stars.png">
+                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/stars.png" class="mx-auto">
+            </a>
+        </div>
+        <div class="my-5">
+            <a href="https://scottplotstatsstorage.z20.web.core.windows.net/stars-week.png">
+                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/stars-week.png" class="mx-auto">
+            </a>
+        </div>
+        <div class="my-5">
+            <a href="https://scottplotstatsstorage.z20.web.core.windows.net/stars-month.png">
+                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/stars-month.png" class="mx-auto">
+            </a>
         </div>
     </div>
-	
+
     <div class="text-center my-5">
-        <h1>ScottPlot GitHub Issue Statistics</h1>
+        <h1>ScottPlot GitHub Issues</h1>
+        <div id="issue-details" class="text-center">
+        </div>
         <div class="my-5">
             <a href="https://scottplotstatsstorage.z20.web.core.windows.net/issues-open.png">
-                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/issues-open.png"
-                    class="mx-auto">
+                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/issues-open.png" class="mx-auto">
             </a>
         </div>
         <div class="my-5">
             <a href="https://scottplotstatsstorage.z20.web.core.windows.net/issues-opened.png">
-                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/issues-opened.png"
-                    class="mx-auto">
+                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/issues-opened.png" class="mx-auto">
             </a>
         </div>
         <div class="my-5">
             <a href="https://scottplotstatsstorage.z20.web.core.windows.net/issues-duration.png">
-                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/issues-duration.png"
-                    class="mx-auto">
+                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/issues-duration.png" class="mx-auto">
             </a>
         </div>
         <div class="my-5">
             <a href="https://scottplotstatsstorage.z20.web.core.windows.net/issues-closed.png">
-                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/issues-closed.png"
-                    class="mx-auto">
+                <img src="https://scottplotstatsstorage.z20.web.core.windows.net/issues-closed.png" class="mx-auto">
             </a>
         </div>
     </div>
-	
+
     <footer class="text-center my-5">
         <a href="https://github.com/swharden/ScottPlotStats">https://github.com/swharden/ScottPlotStats</a>
     </footer>
@@ -76,6 +95,7 @@
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
     <script>
+
         fetch(`https://scottplotstatsstorage.z20.web.core.windows.net/scottplot-log.json`)
             .then(response => response.json())
             .then(data => {
@@ -88,6 +108,17 @@
                 el.innerHTML += `<p>Last checked ${lastUpdate.toLocaleString()} (${minutesSinceLastUpdate.toFixed(2)} minutes ago)</p>`;
                 el.innerHTML += `<p>Last new count ${lastNewRecord.toLocaleString()} (${hoursSinceLastNewRecord.toFixed(2)} hours ago)</p>`;
             });
+
+        fetch(`https://scottplotstatsstorage.z20.web.core.windows.net/stars-log.txt`)
+            .then(response => response.json())
+            .then(data => {
+                const el = document.getElementById("star-details");
+                const lastUpdate = new Date(data.updated);
+                const minutesSinceLastUpdate = Math.abs(new Date() - lastUpdate) / 1000 / 60;
+                el.innerHTML += `<p>Total stars: ${data.total.toLocaleString()}</p>`;
+                el.innerHTML += `<p>Last checked ${lastUpdate.toLocaleString()} (${minutesSinceLastUpdate.toFixed(2)} minutes ago)</p>`;
+            });
+
     </script>
 </body>
 
