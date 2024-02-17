@@ -1,6 +1,5 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using System.Reflection.Metadata;
 
 namespace ScottPlotStats.Functions;
 
@@ -31,8 +30,9 @@ public class UpdateIssuesFunction(ILoggerFactory loggerFactory)
 
     private GitHubIssueCollection GetIssues()
     {
-        Logger.LogInformation("Fetching issues from GitHub API...");
+        Logger.LogInformation("Creating GitHub data fetcher with custom token...");
         GitHubDataFetcher api = new("scottplot", "scottplot");
+        Logger.LogInformation("Fetching issue pages via GitHub API...");
         GitHubIssueCollection issues = api.GetIssues();
         Logger.LogInformation("Retrieved {count} issues.", issues.Count);
         return issues;
