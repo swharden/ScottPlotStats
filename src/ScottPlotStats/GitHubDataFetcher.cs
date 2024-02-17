@@ -29,7 +29,7 @@ public class GitHubDataFetcher
             return token;
         }
 
-        string? gitHubToken = Environment.GetEnvironmentVariable("github_token", EnvironmentVariableTarget.Process);
+        string? gitHubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN", EnvironmentVariableTarget.Process);
         if (gitHubToken is not null)
         {
             Console.WriteLine($"Loaded {gitHubToken.Length} byte GitHub token from environment variable");
