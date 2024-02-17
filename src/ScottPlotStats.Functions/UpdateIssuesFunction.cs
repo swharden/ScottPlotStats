@@ -31,7 +31,7 @@ public class UpdateIssuesFunction(ILoggerFactory loggerFactory)
 
     private GitHubIssueCollection GetIssues()
     {
-        Logger.LogInformation("Fetching GitHub issues...");
+        Logger.LogInformation("Fetching issues from GitHub API...");
         GitHubDataFetcher api = new("scottplot", "scottplot");
         GitHubIssueCollection issues = api.GetIssues();
         Logger.LogInformation("Retrieved {count} issues.", issues.Count);
