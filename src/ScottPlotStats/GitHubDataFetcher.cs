@@ -4,7 +4,11 @@ public class GitHubDataFetcher
 {
     public readonly string User;
     public readonly string Repo;
-    private readonly HttpClient HttpClient;
+    public string BaseUrl => $"https://api.github.com/repos/{User}/{Repo}";
+
+    private readonly HttpClient HttpIssueClient;
+
+    private readonly HttpClient HttpStarClient;
 
     public GitHubDataFetcher(string user, string repo)
     {
@@ -13,10 +17,15 @@ public class GitHubDataFetcher
 
         string token = ReadGitHubToken();
 
-        HttpClient = new();
-        HttpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
-        HttpClient.DefaultRequestHeaders.Add("User-Agent", "Other");
-        HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        HttpIssueClient = new();
+        HttpIssueClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+        HttpIssueClient.DefaultRequestHeaders.Add("User-Agent", "Other");
+        HttpIssueClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+        HttpStarClient = new();
+        HttpStarClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3.star+json");
+        HttpStarClient.DefaultRequestHeaders.Add("User-Agent", "Other");
+        HttpStarClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
     }
 
     private static string ReadGitHubToken()
@@ -52,26 +61,56 @@ public class GitHubDataFetcher
         return issues;
     }
 
-    private int AddIssuesFromPage(GitHubIssueCollection issues, int page)
+    public GitHubStarsCollection GetStars(int maximumPage = int.MaxValue)
     {
-        string url = $"https://api.github.com/repos/{User}/{Repo}/issues?state=all&per_page=100&page={page}";
+        GitHubStarsCollection stars = new();
 
-        using HttpResponseMessage response = HttpClient.GetAsync(url).Result;
-        if (!response.IsSuccessStatusCode)
+        int lastPage = AddStarsFromPage(stars, 1);
+        for (int i = 2; i <= lastPage; i++)
         {
-            throw new InvalidOperationException($"Response error code {response.StatusCode}");
+            AddStarsFromPage(stars, i);
+            if (i >= maximumPage)
+                break;
         }
+
+        return stars;
+    }
+
+    private (string body, int lastPage, int remainingRequests) GetPage(HttpClient client, string url)
+    {
+        using HttpResponseMessage response = client.GetAsync(url).Result;
+        if (!response.IsSuccessStatusCode)
+            throw new InvalidOperationException($"Response error code {response.StatusCode}");
 
         Dictionary<string, IEnumerable<string>> headers = response.Headers.ToDictionary();
         int remainingRequests = GetRemainingRequests(headers);
         int lastPage = GetLastPageNumber(headers);
-
         string body = response.Content.ReadAsStringAsync().Result;
-        issues.AddRangeFromJson(body);
+        return (body, lastPage, remainingRequests);
+    }
 
+    private int AddIssuesFromPage(GitHubIssueCollection issues, int page)
+    {
+        string url = $"{BaseUrl}/issues?state=all&per_page=100&page={page}";
+        (string body, int lastPage, int remainingRequests) = GetPage(HttpIssueClient, url);
+
+        issues.AddRangeFromJson(body);
         Console.WriteLine($"Processed page {page} of {lastPage} " +
             $"({body.Length / 1000:N2} kB) " +
             $"containing {issues.Count} issues ({remainingRequests:N0} requests remaining)");
+
+        return lastPage;
+    }
+
+    private int AddStarsFromPage(GitHubStarsCollection stars, int page)
+    {
+        string url = $"{BaseUrl}/stargazers?per_page=100&page={page}";
+        (string body, int lastPage, int remainingRequests) = GetPage(HttpStarClient, url);
+
+        stars.AddRangeFromJson(body);
+        Console.WriteLine($"Processed page {page} of {lastPage} " +
+            $"({body.Length / 1000:N2} kB) " +
+            $"containing {stars.Count} issues ({remainingRequests:N0} requests remaining)");
 
         return lastPage;
     }

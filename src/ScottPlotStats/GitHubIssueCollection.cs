@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 
 namespace ScottPlotStats;
 
@@ -15,9 +16,9 @@ public class GitHubIssueCollection
 
     }
 
-    public void AddRangeFromJson(string body)
+    public void AddRangeFromJson(string json)
     {
-        using JsonDocument document = JsonDocument.Parse(body);
+        using JsonDocument document = JsonDocument.Parse(json);
         foreach (JsonElement el in document.RootElement.EnumerateArray())
         {
             GitHubIssue issue = new(el);
@@ -70,5 +71,20 @@ public class GitHubIssueCollection
         }
 
         return issuesByDay;
+    }
+
+    public string GetLogJson()
+    {
+        using MemoryStream ms1 = new();
+        JsonWriterOptions options = new() { Indented = true };
+        using Utf8JsonWriter writer = new(ms1, options);
+        writer.WriteStartObject();
+        writer.WriteString("updated", DateTime.Now.ToUniversalTime().ToString("o"));
+        writer.WriteNumber("total", Count);
+        writer.WriteEndObject();
+        writer.Flush();
+        writer.Flush();
+        byte[] bytes = ms1.ToArray();
+        return Encoding.UTF8.GetString(bytes);
     }
 }
