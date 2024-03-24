@@ -4,6 +4,8 @@
 
 [NuGet Trends](https://nugettrends.com/packages?ids=ScottPlot&months=36) is a similar project, but their data is only updated once per week, and they only serve data in JSON format (requiring JavaScript to plot it) so their graphs can not be displayed in GitHub readme files.
 
+**See all stats:** https://scottplotstatsstorage.z20.web.core.windows.net
+
 <div align="center">
 
 <a href="https://scottplotstatsstorage.z20.web.core.windows.net/scottplot-download-count.png?nocache"><img src="https://scottplotstatsstorage.z20.web.core.windows.net/scottplot-download-count.png?nocache"></a>
