@@ -6,7 +6,9 @@ public class GitHubIssuePlotting
     readonly List<double> OpenCount = [];
     readonly List<double> TotalOpened = [];
     readonly List<double> MeanOpenTime = [];
+    readonly List<double> MedianOpenTime = [];
     readonly List<double> DaysSinceLastClose = [];
+    readonly List<double> PercentLongRunning = [];
 
     public GitHubIssuePlotting(GitHubIssueCollection issues)
     {
@@ -20,9 +22,24 @@ public class GitHubIssuePlotting
             TotalOpened.Add(total);
 
             if (dayIssues.Count != 0)
-                MeanOpenTime.Add(dayIssues.Select(x => x.OpenDays).Average());
+            {
+                double[] openDays = dayIssues.Select(x => x.OpenDays).ToArray();
+                Array.Sort(openDays);
+
+                MeanOpenTime.Add(openDays.Average());
+
+                double medianOpenDays = openDays[openDays.Length / 2];
+                MedianOpenTime.Add(medianOpenDays);
+
+                int issuesOverMonth = openDays.Where(x => x > 90).Count();
+                PercentLongRunning.Add(100.0 * issuesOverMonth / openDays.Length);
+            }
             else
+            {
                 MeanOpenTime.Add(0);
+                MedianOpenTime.Add(0);
+                PercentLongRunning.Add(0);
+            }
 
             var issuesClosedToday = dayIssues.Where(x => DateOnly.FromDateTime(x.DateTimeEnd) == day);
             if (issuesClosedToday.Any())
@@ -72,6 +89,19 @@ public class GitHubIssuePlotting
         plot.Title("Days Since an Issue was Closed");
         var sp = plot.Add.Scatter(Dates, DaysSinceLastClose);
         sp.MarkerSize = 0;
+        plot.Axes.DateTimeTicksBottom();
+        return plot;
+    }
+
+    public ScottPlot.Plot PercentLongRunningIssues()
+    {
+        ScottPlot.Plot plot = new();
+        plot.Title("Long-Running Issues");
+
+        var sp2 = plot.Add.Scatter(Dates, PercentLongRunning);
+        sp2.MarkerSize = 0;
+
+        plot.YLabel("% Open Over 90 Days");
         plot.Axes.DateTimeTicksBottom();
         return plot;
     }
