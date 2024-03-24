@@ -32,6 +32,14 @@ public class GitHubStarsCollection
             .ToArray();
     }
 
+    public string[] GetStargazerNames()
+    {
+        return Stars
+            .OrderBy(x => x.DateTime)
+            .Select(x => x.User)
+            .ToArray();
+    }
+
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     public string ToJson()

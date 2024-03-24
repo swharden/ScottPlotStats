@@ -1,4 +1,7 @@
-﻿namespace ScottPlotStats;
+﻿using ScottPlot;
+using System.Text;
+
+namespace ScottPlotStats;
 
 public class GitHubStarPlotting(GitHubStarsCollection stars)
 {
@@ -10,11 +13,35 @@ public class GitHubStarPlotting(GitHubStarsCollection stars)
         int[] counts = Enumerable.Range(1, dates.Length).ToArray();
 
         ScottPlot.Plot plt = new();
-        var sp = plt.Add.Scatter(dates, counts);
-        sp.MarkerSize = 0;
+        var sp = plt.Add.ScatterLine(dates, counts);
         sp.LineWidth = 2;
         plt.Axes.DateTimeTicksBottom();
-        plt.Title("ScottPlot Stars on GitHub");
+        plt.Title($"ScottPlot GitHub Stars (Updated {DateTime.Now.ToShortDateString()})");
+
+        StringBuilder sb = new();
+        sb.AppendLine("Recent Stargazers:");
+        int stargazersToShow = 20;
+        string[] stargazers = Stars.GetStargazerNames();
+        string[] lastNames = stargazers.Skip(stargazers.Length - stargazersToShow).ToArray();
+        foreach (string name in lastNames)
+        {
+            sb.AppendLine(name);
+        }
+
+        var an = plt.Add.Annotation(sb.ToString().Trim(), ScottPlot.Alignment.UpperLeft);
+        an.OffsetY = -110; // TODO: https://github.com/ScottPlot/ScottPlot/issues/3535
+        an.Label.BackColor = Colors.Yellow.WithAlpha(.4);
+        //an.Label.BorderWidth = 0; // TODO: https://github.com/ScottPlot/ScottPlot/issues/3538
+        an.Label.BorderColor = Colors.Transparent;
+
+        var txt = plt.Add.Text($"{counts.Last():N0}", dates.Last().ToOADate(), counts.Last());
+        txt.Label.Alignment = ScottPlot.Alignment.LowerRight;
+        txt.Label.FontSize = 22;
+        txt.Label.Bold = true;
+        txt.Label.Rotation = -45;
+        txt.Label.OffsetY = 10;
+        txt.Label.OffsetX = -20;
+
         return plt;
     }
 
