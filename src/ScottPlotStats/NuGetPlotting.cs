@@ -1,4 +1,6 @@
-﻿namespace ScottPlotStats;
+﻿using ScottPlot;
+
+namespace ScottPlotStats;
 
 public static class NuGetPlotting
 {
@@ -16,10 +18,20 @@ public static class NuGetPlotting
         }
 
         ScottPlot.Plot plot = new();
+
         var sp = plot.Add.Scatter(dates, counts);
         sp.MarkerSize = 0;
         sp.LineWidth = 2;
-        plot.Title("ScottPlot NuGet Package Total Downloads");
+
+        var txt = plot.Add.Text($"{counts.Last():N0}", dates.Last().ToOADate(), counts.Last());
+        txt.Label.Alignment = ScottPlot.Alignment.LowerRight;
+        txt.Label.FontSize = 22;
+        txt.Label.Bold = true;
+        txt.Label.Rotation = -60;
+        txt.Label.OffsetY = 10;
+        txt.Label.OffsetX = -20;
+
+        plot.Title("ScottPlot NuGet Package Downloads");
         plot.Axes.Top.MaximumSize = 10;
         plot.Axes.DateTimeTicksBottom();
 

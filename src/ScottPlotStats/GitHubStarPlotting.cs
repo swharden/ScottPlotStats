@@ -16,7 +16,15 @@ public class GitHubStarPlotting(GitHubStarsCollection stars)
         var sp = plt.Add.ScatterLine(dates, counts);
         sp.LineWidth = 2;
         plt.Axes.DateTimeTicksBottom();
-        plt.Title($"ScottPlot GitHub Stars (Updated {DateTime.Now.ToShortDateString()})");
+        plt.Title($"ScottPlot GitHub Stars");
+
+        /*
+        var an1 = plt.Add.Annotation($"Updated {DateTime.Now.ToShortDateString()} at {DateTime.Now.ToShortTimeString()} EST", Alignment.LowerRight);
+        an1.Label.BackgroundColor = Colors.White.MixedWith(Colors.Black, .05);
+        an1.Label.ShadowColor = Colors.Transparent;
+        an1.Label.BorderColor = Colors.White.MixedWith(Colors.Black, .1);
+        an1.Label.ForeColor = Colors.Black;
+        */
 
         StringBuilder sb = new();
         sb.AppendLine("Recent Stargazers:");
@@ -29,10 +37,11 @@ public class GitHubStarPlotting(GitHubStarsCollection stars)
         }
 
         var an = plt.Add.Annotation(sb.ToString().Trim(), ScottPlot.Alignment.UpperLeft);
-        an.Label.BackgroundColor = Colors.Yellow.WithAlpha(.4);
-        an.Label.ShadowColor = Colors.Transparent;
-        an.Label.BorderColor = Colors.Black.WithAlpha(.5);
-        an.Label.BorderWidth = 2;
+        an.Label.BackgroundColor = Color.FromHex("#f6f6dd");
+        an.Label.ShadowColor = Colors.Black.WithAlpha(.2);
+        an.Label.BorderColor = Colors.Black;
+        an.Label.BorderWidth = 1;
+        an.Label.AntiAlias = true;
 
         var txt = plt.Add.Text($"{counts.Last():N0}", dates.Last().ToOADate(), counts.Last());
         txt.Label.Alignment = ScottPlot.Alignment.LowerRight;
