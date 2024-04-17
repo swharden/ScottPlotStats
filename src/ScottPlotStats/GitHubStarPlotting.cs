@@ -29,10 +29,10 @@ public class GitHubStarPlotting(GitHubStarsCollection stars)
         }
 
         var an = plt.Add.Annotation(sb.ToString().Trim(), ScottPlot.Alignment.UpperLeft);
-        an.OffsetY = -110; // TODO: https://github.com/ScottPlot/ScottPlot/issues/3535
-        an.Label.BackColor = Colors.Yellow.WithAlpha(.4);
-        //an.Label.BorderWidth = 0; // TODO: https://github.com/ScottPlot/ScottPlot/issues/3538
-        an.Label.BorderColor = Colors.Transparent;
+        an.Label.BackgroundColor = Colors.Yellow.WithAlpha(.4);
+        an.Label.ShadowColor = Colors.Transparent;
+        an.Label.BorderColor = Colors.Black.WithAlpha(.5);
+        an.Label.BorderWidth = 2;
 
         var txt = plt.Add.Text($"{counts.Last():N0}", dates.Last().ToOADate(), counts.Last());
         txt.Label.Alignment = ScottPlot.Alignment.LowerRight;
