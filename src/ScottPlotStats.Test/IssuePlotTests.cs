@@ -12,6 +12,7 @@ public class IssuePlotTests
         plotter.MeanOpenIssueDuration().SavePng("plot-duration.png", 600, 400);
         plotter.DaysSinceIssueClosed().SavePng("plot-closed.png", 600, 400);
         plotter.PercentLongRunningIssues().SavePng("plot-long.png", 600, 400);
+        plotter.NewIssuesPerWeek().SavePng("issues-per-week.png", 600, 400);
         Console.Write($"Saved images in: {Path.GetFullPath("./")}");
     }
 }

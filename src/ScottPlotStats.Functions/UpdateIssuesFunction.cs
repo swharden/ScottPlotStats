@@ -29,6 +29,7 @@ public class UpdateIssuesFunction(ILoggerFactory loggerFactory)
         blob.SavePng(plotter.MeanOpenIssueDuration(), "issues-duration.png", 600, 400);
         blob.SavePng(plotter.DaysSinceIssueClosed(), "issues-closed.png", 600, 400);
         blob.SavePng(plotter.PercentLongRunningIssues(), "issues-long.png", 600, 400);
+        blob.SavePng(plotter.NewIssuesPerWeek(), "issues-week.png", 600, 400);
 
         blob.SaveText(issues.GetLogJson(), "issues-log.txt");
     }

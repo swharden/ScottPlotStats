@@ -24,12 +24,12 @@ public static class NuGetPlotting
         sp.LineWidth = 2;
 
         var txt = plot.Add.Text($"{counts.Last():N0}", dates.Last().ToOADate(), counts.Last());
-        txt.Label.Alignment = ScottPlot.Alignment.LowerRight;
-        txt.Label.FontSize = 22;
-        txt.Label.Bold = true;
-        txt.Label.Rotation = -60;
-        txt.Label.OffsetY = 10;
-        txt.Label.OffsetX = -20;
+        txt.LabelAlignment = ScottPlot.Alignment.LowerRight;
+        txt.LabelFontSize = 22;
+        txt.LabelBold = true;
+        txt.LabelRotation = -60;
+        txt.LabelOffsetY = 10;
+        txt.LabelOffsetX = -20;
 
         plot.Title("ScottPlot NuGet Package Downloads");
         plot.Axes.Top.MaximumSize = 10;

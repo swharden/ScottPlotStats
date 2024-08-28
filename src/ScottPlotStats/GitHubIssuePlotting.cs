@@ -1,7 +1,11 @@
-﻿namespace ScottPlotStats;
+﻿using ScottPlot;
+using ScottPlot.Colormaps;
+
+namespace ScottPlotStats;
 
 public class GitHubIssuePlotting
 {
+    readonly DateOnly[] OpenDates;
     readonly List<DateTime> Dates = [];
     readonly List<double> OpenCount = [];
     readonly List<double> TotalOpened = [];
@@ -12,6 +16,7 @@ public class GitHubIssuePlotting
 
     public GitHubIssuePlotting(GitHubIssueCollection issues)
     {
+        OpenDates = issues.GetIssues().Select(x => DateOnly.FromDateTime(x.DateTimeStart)).ToArray();
         int lastCloseDays = 0;
         int total = 0;
         foreach ((var day, var dayIssues) in issues.GetIssuesByDay())
@@ -103,6 +108,71 @@ public class GitHubIssuePlotting
 
         plot.YLabel("% Open Over 90 Days");
         plot.Axes.DateTimeTicksBottom();
+        return plot;
+    }
+
+    private static double[] FilterForward(double[] values, int windowSize)
+    {
+        double[] smooth = new double[values.Length];
+
+        double runningSum = 0;
+
+        for (int i = 0; i < smooth.Length; i++)
+        {
+            runningSum += values[i];
+
+            if (i >= windowSize)
+            {
+                runningSum -= values[i - windowSize];
+                smooth[i] = runningSum / windowSize;
+            }
+            else
+            {
+                smooth[i] = runningSum / (i + 1);
+            }
+        }
+
+        return smooth;
+    }
+
+    public ScottPlot.Plot NewIssuesPerWeek()
+    {
+        ScottPlot.Plot plot = new();
+
+        int weekCount = Dates.Count / 7;
+        DateTime[] weekStarts = Enumerable.Range(0, weekCount).Select(x => Dates[x * 7]).ToArray();
+        double[] weekNewIssues = new double[weekCount];
+
+        for (int weekIndex = 0; weekIndex < weekCount; weekIndex++)
+        {
+            for (int dayIndex = 0; dayIndex < 7; dayIndex++)
+            {
+                DateOnly day = DateOnly.FromDateTime(Dates[weekIndex * 7 + dayIndex]);
+                weekNewIssues[weekIndex] += OpenDates.Count(x => x == day);
+            }
+        }
+
+        plot.Title("New Issues per Week");
+
+        var bars = plot.Add.Bars(weekStarts.Select(x => x.ToOADate()), weekNewIssues);
+        foreach (var bar in bars.Bars)
+        {
+            bar.BorderLineWidth = 0;
+            bar.Size = 10; //oversize to avoid anti-alias errors
+        }
+        bars.LegendText = "Issues per week";
+
+        double[] smoothed = FilterForward(weekNewIssues, 12);
+        var sp = plot.Add.ScatterLine(weekStarts, smoothed);
+        sp.LineWidth = 2;
+        sp.LineColor = Colors.Black;
+        sp.LegendText = "3 month average";
+
+        plot.Legend.Alignment = Alignment.UpperLeft;
+
+        plot.YLabel("# New Issues");
+        plot.Axes.DateTimeTicksBottom();
+        plot.Axes.Margins(bottom: 0);
         return plot;
     }
 }
