@@ -2,9 +2,12 @@
 
 internal class SampleData
 {
+    public const string IssuesJsonFilePath = "../../../../../dev/SampleData/issues.json";
+    public const string StarsJsonFilePath = "../../../../../dev/SampleData/stars.json";
+
     public static readonly string IssuePageJson = File.ReadAllText("../../../../../dev/SampleData/issue-page-1.json");
-    public static readonly string IssuesJson = File.ReadAllText("../../../../../dev/SampleData/issues.json");
-    public static readonly string StarsJson = File.ReadAllText("../../../../../dev/SampleData/stars.json");
+    public static readonly string IssuesJson = File.ReadAllText(IssuesJsonFilePath);
+    public static readonly string StarsJson = File.ReadAllText(StarsJsonFilePath);
 
     public static GitHubIssueCollection IssueCollection = GitHubIssueCollection.FromJson(IssuesJson);
 
