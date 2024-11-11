@@ -19,9 +19,9 @@ public static class NuGetPlotting
 
         ScottPlot.Plot plot = new();
 
-        var sp = plot.Add.Scatter(dates, counts);
-        sp.MarkerSize = 0;
-        sp.LineWidth = 2;
+        var sp = plot.Add.ScatterLine(dates, counts);
+        sp.LineWidth = 1.5f;
+        sp.FillY = true;
 
         var txt = plot.Add.Text($"{counts.Last():N0}", dates.Last().ToOADate(), counts.Last());
         txt.LabelAlignment = ScottPlot.Alignment.LowerRight;
@@ -34,6 +34,8 @@ public static class NuGetPlotting
         plot.Title("ScottPlot NuGet Package Downloads");
         plot.Axes.Top.MaximumSize = 10;
         plot.Axes.DateTimeTicksBottom();
+
+        plot.Add.HorizontalLine(0, 1, Colors.Black, LinePattern.DenselyDashed);
 
         return plot;
     }
@@ -83,17 +85,20 @@ public static class NuGetPlotting
 
         var sp1 = plot.Add.Scatter(binTimes, binCountDeltas);
         sp1.MarkerSize = 0;
-        sp1.LineWidth = 2;
-        sp1.Color = sp1.Color.WithAlpha(.3);
-        sp1.LegendText = "Rate by Week";
+        sp1.LineWidth = 1.5f;
+        sp1.Color = sp1.Color.WithAlpha(.5);
+        sp1.FillY = true;
+        sp1.LegendText = "Downloads per Week";
 
         double[] sma = ScottPlot.Statistics.Series.MovingAverage(binCountDeltas, window: 12, preserveLength: true);
         sma = sma.Select(x => double.IsNaN(x) ? 0 : x).ToArray();
         var sp2 = plot.Add.Scatter(binTimes, sma);
         sp2.MarkerSize = 0;
-        sp2.LineWidth = 2;
-        sp2.Color = sp1.Color.WithAlpha(255);
+        sp2.LineWidth = 1.5f;
+        sp2.Color = Colors.Black;
         sp2.LegendText = "3 Month Average";
+
+        plot.Add.HorizontalLine(0, 1, Colors.Black, LinePattern.DenselyDashed);
 
         plot.ShowLegend(ScottPlot.Alignment.UpperLeft);
         plot.Title("ScottPlot NuGet Package Downloads per Week");

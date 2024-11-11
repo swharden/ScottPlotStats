@@ -15,20 +15,18 @@ public class GitHubStarPlotting(GitHubStarsCollection stars)
         ScottPlot.Plot plt = new();
         var sp = plt.Add.ScatterLine(dates, counts);
         sp.LineWidth = 2;
+        sp.FillY = true;
         plt.Axes.DateTimeTicksBottom();
         plt.Title($"ScottPlot GitHub Stars");
 
-        StringBuilder sb = new();
-        sb.AppendLine("Recent Stargazers:");
-        int stargazersToShow = 20;
+        int stargazersToShow = 13;
         string[] stargazers = Stars.GetStargazerNames();
-        string[] lastNames = stargazers.Skip(stargazers.Length - stargazersToShow).ToArray();
-        foreach (string name in lastNames)
-        {
-            sb.AppendLine(name);
-        }
+        string[] lastNames = stargazers.Skip(stargazers.Length - stargazersToShow).Select(x => "  " + x.Trim()).ToArray();
+        string text = "Recent Stargazers:\n" + string.Join("\n", lastNames);
 
-        var an = plt.Add.Annotation(sb.ToString().Trim(), ScottPlot.Alignment.UpperLeft);
+        plt.Add.HorizontalLine(0, 1, Colors.Black, LinePattern.DenselyDashed);
+
+        var an = plt.Add.Annotation(text, ScottPlot.Alignment.UpperLeft);
         an.LabelBackgroundColor = Color.FromHex("#f6f6dd");
         an.LabelShadowColor = Colors.Black.WithAlpha(.2);
         an.LabelBorderColor = Colors.Black;
@@ -73,9 +71,12 @@ public class GitHubStarPlotting(GitHubStarsCollection stars)
             counts[bin] += 1;
         }
 
-        var sp = plt.Add.Scatter(bins, counts);
-        sp.MarkerSize = 0;
+        var sp = plt.Add.ScatterLine(bins, counts);
         sp.LineWidth = 2;
+        sp.FillY = true;
+
+        plt.Add.HorizontalLine(0, 1, Colors.Black, LinePattern.DenselyDashed);
+
         plt.Axes.DateTimeTicksBottom();
         plt.Title($"ScottPlot New Stars per {name}");
         return plt;
