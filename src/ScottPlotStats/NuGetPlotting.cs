@@ -85,7 +85,7 @@ public static class NuGetPlotting
         sp1.MarkerSize = 0;
         sp1.LineWidth = 2;
         sp1.Color = sp1.Color.WithAlpha(.3);
-        sp1.Label = "Rate by Week";
+        sp1.LegendText = "Rate by Week";
 
         double[] sma = ScottPlot.Statistics.Series.MovingAverage(binCountDeltas, window: 12, preserveLength: true);
         sma = sma.Select(x => double.IsNaN(x) ? 0 : x).ToArray();
@@ -93,7 +93,7 @@ public static class NuGetPlotting
         sp2.MarkerSize = 0;
         sp2.LineWidth = 2;
         sp2.Color = sp1.Color.WithAlpha(255);
-        sp2.Label = "3 Month Average";
+        sp2.LegendText = "3 Month Average";
 
         plot.ShowLegend(ScottPlot.Alignment.UpperLeft);
         plot.Title("ScottPlot NuGet Package Downloads per Week");

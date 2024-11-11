@@ -1,5 +1,6 @@
 ﻿using ScottPlot;
 using ScottPlot.Colormaps;
+using SkiaSharp;
 
 namespace ScottPlotStats;
 
@@ -55,61 +56,67 @@ public class GitHubIssuePlotting
         }
     }
 
-    public ScottPlot.Plot NumberOfOpenIssues()
+    /*
+    private static Plot StyleFilledLineGraph(IEnumerable<DateTime> dates, IEnumerable<int> values, string title, bool average = true)
     {
-        ScottPlot.Plot plot = new();
-        plot.Title("Number of Open Issues");
-        var sp = plot.Add.Scatter(Dates, OpenCount);
-        sp.LineStyle.Width = 2;
-        sp.MarkerSize = 0;
+        return StyleFilledLineGraph(dates, values.Select(x => (double)x), title, average);
+    }
+    */
+
+    private static Plot StyleFilledLineGraph(IEnumerable<DateTime> dates, IEnumerable<double> values, string title, bool average = true)
+    {
+        DateTime[] dates2 = dates.ToArray();
+        double[] values2 = values.ToArray();
+
+        Plot plot = new();
+        plot.Title(title);
         plot.Axes.DateTimeTicksBottom();
+        plot.Add.HorizontalLine(0, 1, Colors.Black, LinePattern.DenselyDashed);
+        var sp = plot.Add.ScatterLine(dates2, values2);
+        sp.LineStyle.Width = 1.5f;
+        sp.LineColor = average ? Colors.C0.WithAlpha(.5) : Colors.C0;
+        sp.FillY = true;
+        sp.FillYColor = Colors.C0.WithAlpha(.2);
+
+        if (average)
+        {
+            double[] runningAverage = new double[values2.Length];
+            for (int i = 0; i < values2.Length; i++)
+            {
+                DateTime endDate = dates2[i];
+                DateTime startDate = dates2[i] - TimeSpan.FromDays(90);
+
+                int count = 0;
+                double sum = 0;
+                for (int j = 0; j < values2.Length; j++)
+                {
+                    if (dates2[j] >= startDate && dates2[j] <= endDate)
+                    {
+                        count += 1;
+                        sum += values2[j];
+                    }
+                }
+                runningAverage[i] = sum / count;
+            }
+
+            var sp2 = plot.Add.ScatterLine(dates2, runningAverage);
+            sp2.LineStyle.Width = 1.5f;
+            sp2.LineColor = Colors.Black;
+            sp2.LegendText = "3 month average";
+
+            sp.LegendText = "Daily Value";
+
+            plot.Legend.Alignment = Alignment.UpperRight;
+        }
+
         return plot;
     }
 
-    public ScottPlot.Plot NumberOfIssuesOpened()
-    {
-        ScottPlot.Plot plot = new();
-        plot.Title("Total Number of Issues Opened");
-        var sp = plot.Add.Scatter(Dates, TotalOpened);
-        sp.LineStyle.Width = 2;
-        sp.MarkerSize = 0;
-        plot.Axes.DateTimeTicksBottom();
-        return plot;
-    }
-
-    public ScottPlot.Plot MeanOpenIssueDuration()
-    {
-        ScottPlot.Plot plot = new();
-        plot.Title("Mean Open Issue Duration");
-        var sp = plot.Add.Scatter(Dates, MeanOpenTime);
-        sp.LineStyle.Width = 2;
-        sp.MarkerSize = 0;
-        plot.Axes.DateTimeTicksBottom();
-        return plot;
-    }
-
-    public ScottPlot.Plot DaysSinceIssueClosed()
-    {
-        ScottPlot.Plot plot = new();
-        plot.Title("Days Since an Issue was Closed");
-        var sp = plot.Add.Scatter(Dates, DaysSinceLastClose);
-        sp.MarkerSize = 0;
-        plot.Axes.DateTimeTicksBottom();
-        return plot;
-    }
-
-    public ScottPlot.Plot PercentLongRunningIssues()
-    {
-        ScottPlot.Plot plot = new();
-        plot.Title("Long-Running Issues");
-
-        var sp2 = plot.Add.Scatter(Dates, PercentLongRunning);
-        sp2.MarkerSize = 0;
-
-        plot.YLabel("% Open Over 90 Days");
-        plot.Axes.DateTimeTicksBottom();
-        return plot;
-    }
+    public ScottPlot.Plot NumberOfOpenIssues() => StyleFilledLineGraph(Dates, OpenCount, "Number of Open Issues", false);
+    public ScottPlot.Plot NumberOfIssuesOpened() => StyleFilledLineGraph(Dates, TotalOpened, "Total Number of Issues Opened", false);
+    public ScottPlot.Plot MeanOpenIssueDuration() => StyleFilledLineGraph(Dates, MeanOpenTime, "Mean Open Issue Duration");
+    public ScottPlot.Plot DaysSinceIssueClosed() => StyleFilledLineGraph(Dates, DaysSinceLastClose, "Days Since an Issue was Closed");
+    public ScottPlot.Plot PercentLongRunningIssues() => StyleFilledLineGraph(Dates, PercentLongRunning, "% Open Over 90 Days");
 
     private static double[] FilterForward(double[] values, int windowSize)
     {
@@ -157,10 +164,11 @@ public class GitHubIssuePlotting
         var bars = plot.Add.Bars(weekStarts.Select(x => x.ToOADate()), weekNewIssues);
         foreach (var bar in bars.Bars)
         {
-            bar.BorderLineWidth = 0;
+            bar.LineWidth = 0;
             bar.Size = 10; //oversize to avoid anti-alias errors
         }
         bars.LegendText = "Issues per week";
+        bars.Color = Colors.C0.Lighten(.5);
 
         double[] smoothed = FilterForward(weekNewIssues, 12);
         var sp = plot.Add.ScatterLine(weekStarts, smoothed);
