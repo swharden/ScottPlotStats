@@ -15,6 +15,6 @@ public class IssuePlotTests
         report.AddEmbeddedSvg(plotter.DaysSinceIssueClosed());
         report.AddEmbeddedSvg(plotter.PercentLongRunningIssues());
         report.AddEmbeddedSvg(plotter.NewIssuesPerWeek());
-        report.WriteAllText("report.html");
+        report.SaveAs("report.html");
     }
 }

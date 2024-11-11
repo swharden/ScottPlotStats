@@ -25,4 +25,21 @@ public class IssueApiTests
             Console.WriteLine($"Wrote: {saveAs}");
         }
     }
+
+    [TestMethod]
+    public void Test_FetchStarsFromGitHub()
+    {
+        bool updateDevFile = false;
+        GitHubDataFetcher api = new("scottplot", "scottplot");
+        GitHubStarsCollection starCollection = api.GetStars(updateDevFile ? 999 : 3);
+        starCollection.Count.Should().BeGreaterThan(0);
+        Console.WriteLine($"Finished loading {starCollection.Count:N0} issues.");
+
+        if (updateDevFile)
+        {
+            string saveAs = Path.GetFullPath(SampleData.StarsJsonFilePath);
+            File.WriteAllText(saveAs, starCollection.ToJson());
+            Console.WriteLine($"Wrote: {saveAs}");
+        }
+    }
 }

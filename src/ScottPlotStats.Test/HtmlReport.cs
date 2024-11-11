@@ -41,7 +41,7 @@ internal class HtmlReport
             .Replace("{{CONTENT}}", SB.ToString());
     }
 
-    public void WriteAllText(string file)
+    public void SaveAs(string file)
     {
         file = Path.GetFullPath(file);
         File.WriteAllText(file, GetHtml());
