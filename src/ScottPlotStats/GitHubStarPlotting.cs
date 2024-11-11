@@ -18,14 +18,6 @@ public class GitHubStarPlotting(GitHubStarsCollection stars)
         plt.Axes.DateTimeTicksBottom();
         plt.Title($"ScottPlot GitHub Stars");
 
-        /*
-        var an1 = plt.Add.Annotation($"Updated {DateTime.Now.ToShortDateString()} at {DateTime.Now.ToShortTimeString()} EST", Alignment.LowerRight);
-        an1.Label.BackgroundColor = Colors.White.MixedWith(Colors.Black, .05);
-        an1.Label.ShadowColor = Colors.Transparent;
-        an1.Label.BorderColor = Colors.White.MixedWith(Colors.Black, .1);
-        an1.Label.ForeColor = Colors.Black;
-        */
-
         StringBuilder sb = new();
         sb.AppendLine("Recent Stargazers:");
         int stargazersToShow = 20;
