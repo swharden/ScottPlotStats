@@ -10,7 +10,8 @@ public class GitHubDataFetcher
 
     private readonly HttpClient HttpStarClient;
 
-    public GitHubDataFetcher(string user, string repo)
+    public
+        GitHubDataFetcher(string user, string repo)
     {
         User = user;
         Repo = repo;
@@ -34,7 +35,7 @@ public class GitHubDataFetcher
         if (File.Exists(envFilePath))
         {
             string token = File.ReadAllText(envFilePath);
-            Console.WriteLine($"Loaded {token.Length} byteGitHub token from local file");
+            Console.WriteLine($"Loaded GitHub token from local file");
             return token;
         }
 
@@ -51,80 +52,74 @@ public class GitHubDataFetcher
     public GitHubIssueCollection GetIssues(int maximumPage = int.MaxValue)
     {
         GitHubIssueCollection issues = new();
-        int lastPage = AddIssuesFromPage(issues, 1);
-        for (int i = 2; i <= lastPage; i++)
+        string? nextUrl = AddIssuesFromPage(issues);
+        while (nextUrl is not null)
         {
-            AddIssuesFromPage(issues, i);
-            if (i >= maximumPage)
-                break;
+            nextUrl = AddIssuesFromPage(issues, nextUrl);
         }
         return issues;
     }
 
-    public GitHubStarsCollection GetStars(int maximumPage = int.MaxValue)
+    public GitHubStarsCollection GetStars()
     {
         GitHubStarsCollection stars = new();
 
-        int lastPage = AddStarsFromPage(stars, 1);
-        for (int i = 2; i <= lastPage; i++)
+        string? nextUrl = AddStarsFromPage(stars);
+        while (nextUrl is not null)
         {
-            AddStarsFromPage(stars, i);
-            if (i >= maximumPage)
-                break;
+            nextUrl = AddStarsFromPage(stars, nextUrl);
         }
 
         return stars;
     }
 
-    private (string body, int lastPage, int remainingRequests) GetPage(HttpClient client, string url)
+    private (string body, string? nextUrl, int thisPage, int remainingRequests) GetPage(HttpClient client, string url)
     {
+        string thisPage = url.Split("&").Where(x => x.StartsWith("page=")).First().Split("=")[1];
+        int thisPageNumber = int.Parse(thisPage);
         using HttpResponseMessage response = client.GetAsync(url).Result;
         if (!response.IsSuccessStatusCode)
             throw new InvalidOperationException($"Response error code {response.StatusCode}");
 
         Dictionary<string, IEnumerable<string>> headers = response.Headers.ToDictionary();
         int remainingRequests = GetRemainingRequests(headers);
-        int lastPage = GetLastPageNumber(headers);
+        string? nextUrl = GetNextPageUrl(headers);
         string body = response.Content.ReadAsStringAsync().Result;
-        return (body, lastPage, remainingRequests);
+        return (body, nextUrl, thisPageNumber, remainingRequests);
     }
 
-    private int AddIssuesFromPage(GitHubIssueCollection issues, int page)
+    private string? AddIssuesFromPage(GitHubIssueCollection issues, string? url = null)
     {
-        string url = $"{BaseUrl}/issues?state=all&per_page=100&page={page}";
-        (string body, int lastPage, int remainingRequests) = GetPage(HttpIssueClient, url);
+        url ??= $"{BaseUrl}/issues?state=all&per_page=100&page=1";
+        var (body, nextUrl, thisPage, remainingRequests) = GetPage(HttpIssueClient, url);
 
         issues.AddRangeFromJson(body);
-        Console.WriteLine($"Processed page {page} of {lastPage} " +
-            $"({body.Length / 1000:N2} kB) " +
-            $"containing {issues.Count} issues ({remainingRequests:N0} requests remaining)");
+        Console.WriteLine($"Processed Issues page {thisPage} ({remainingRequests:N0} requests remaining)");
 
-        return lastPage;
+        return nextUrl;
     }
 
-    private int AddStarsFromPage(GitHubStarsCollection stars, int page)
+    private string? AddStarsFromPage(GitHubStarsCollection stars, string? url = null)
     {
-        string url = $"{BaseUrl}/stargazers?per_page=100&page={page}";
-        (string body, int lastPage, int remainingRequests) = GetPage(HttpStarClient, url);
+        url ??= $"{BaseUrl}/stargazers?per_page=100&page=1";
+        var (body, nextUrl, thisPage, remainingRequests) = GetPage(HttpStarClient, url);
 
         stars.AddRangeFromJson(body);
-        Console.WriteLine($"Processed page {page} of {lastPage} " +
-            $"({body.Length / 1000:N2} kB) " +
-            $"containing {stars.Count} issues ({remainingRequests:N0} requests remaining)");
+        Console.WriteLine($"Processed Stargazers page {thisPage} ({remainingRequests:N0} requests remaining)");
 
-        return lastPage;
+        return nextUrl;
     }
 
-    private static int GetLastPageNumber(Dictionary<string, IEnumerable<string>> headers)
+    private static string? GetNextPageUrl(Dictionary<string, IEnumerable<string>> headers)
     {
-        string[] links = headers["Link"].Single().Split(",");
-        var lastLinks = links.Where(x => x.Contains("rel=\"last\""));
-        if (!lastLinks.Any())
-            return -1;
+        if (!headers["Link"].Any())
+            return null;
 
-        string lastLink = lastLinks.Single();
-        int lastPage = int.Parse(lastLink.Split("&page=")[1].Split(">")[0]);
-        return lastPage;
+        string? line = headers["Link"].Last().Split(",").Where(x => x.Contains("rel=\"next\"")).FirstOrDefault();
+        if (line is null)
+            return null;
+
+        return line.Split("<")[1].Split(">")[0];
     }
 
     private int GetRemainingRequests(Dictionary<string, IEnumerable<string>> headers, int minimumRemaining = 100)
