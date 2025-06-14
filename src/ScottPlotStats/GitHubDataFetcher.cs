@@ -49,18 +49,21 @@ public class GitHubDataFetcher
         throw new InvalidOperationException("GitHub token could not be located");
     }
 
-    public GitHubIssueCollection GetIssues(int maximumPage = int.MaxValue)
+    public GitHubIssueCollection GetIssues(int maxPageCount = int.MaxValue)
     {
         GitHubIssueCollection issues = new();
+
         string? nextUrl = AddIssuesFromPage(issues);
         while (nextUrl is not null)
         {
             nextUrl = AddIssuesFromPage(issues, nextUrl);
+            if (maxPageCount-- == 0) return issues;
         }
+
         return issues;
     }
 
-    public GitHubStarsCollection GetStars()
+    public GitHubStarsCollection GetStars(int maxPageCount = int.MaxValue)
     {
         GitHubStarsCollection stars = new();
 
@@ -68,6 +71,7 @@ public class GitHubDataFetcher
         while (nextUrl is not null)
         {
             nextUrl = AddStarsFromPage(stars, nextUrl);
+            if (maxPageCount-- == 0) return stars;
         }
 
         return stars;
